@@ -97,7 +97,7 @@ jobs:
             cd $APP_DIR
 
             echo "📦 Installing deps..."
-            npm ci --omit=dev
+            npm install --omit=dev
 
             echo "♻️ Restarting app..."
             pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
