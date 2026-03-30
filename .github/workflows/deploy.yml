@@ -63,7 +63,6 @@ jobs:
 
             set -e
 
-            # ✅ Load NVM explicitly (works in non-interactive shells)
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -73,6 +72,9 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
+
+            echo "🗑️ Removing old build..."
+            rm -rf .next node_modules   # ← YE ADD KARO
 
             echo "📦 Installing deps..."
             npm install
