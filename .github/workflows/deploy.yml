@@ -59,12 +59,13 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_IP: ${{ secrets.VPS_IP }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << EOF
+          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << 'EOF'
 
             set -e
 
+            # ✅ Load NVM explicitly (works in non-interactive shells)
             export NVM_DIR="$HOME/.nvm"
-            source ~/.bashrc
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
             cd /home/administrator/apps/students/releases/SL-Test-App
 
