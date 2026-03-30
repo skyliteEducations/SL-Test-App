@@ -94,7 +94,7 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-            cd $APP_DIR
+            cd /home/administrator/apps/students/releases/SL-Test-App
 
             echo "📦 Installing deps..."
             npm install --omit=dev

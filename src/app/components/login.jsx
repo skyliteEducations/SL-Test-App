@@ -52,8 +52,8 @@ export default function LoginPage() {
     e.preventDefault();
     // const signal = loginUser(loginForm)
     router.push("/dashboard")
-    if(signal){
-    }
+    // if(signal){
+    // }
   };
 
   return (
