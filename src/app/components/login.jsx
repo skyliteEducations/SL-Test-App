@@ -98,7 +98,7 @@ export default function LoginPage() {
       >
 
         <h1 className="text-3xl font-bold text-center text-teal-700">
-          Students Login
+          Welcome! Students Login
         </h1>
 
         <p className="text-center text-sm text-gray-500 mt-2">

@@ -83,7 +83,7 @@ jobs:
             npm run build
 
             echo "♻️ Restarting app..."
-            pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
+            pm2 restart skyliteeducations || pm2 start npm --name "skyliteeducations" -- star
 
             pm2 save
 
