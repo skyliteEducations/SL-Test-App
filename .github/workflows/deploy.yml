@@ -64,7 +64,7 @@ jobs:
             set -e
 
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            source ~/.bashrc
 
             cd /home/administrator/apps/students/releases/SL-Test-App
 
@@ -83,7 +83,5 @@ jobs:
             pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
 
             pm2 save
-
-            echo "✅ Deployment done!"
 
           EOF
