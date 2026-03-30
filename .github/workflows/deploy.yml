@@ -53,41 +53,13 @@ jobs:
 
             ssh-keyscan -H -p $VPS_PORT $VPS_IP >> ~/.ssh/known_hosts
 
-      # -------------------------
-      # 5. DEPLOY TO VPS
-      # -------------------------
-      - name: Deploy build to VPS
+      - name: Deploy & Restart
         env:
           VPS_PORT: ${{ secrets.VPS_PORT }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_IP: ${{ secrets.VPS_IP }}
-          APP_DIR: ${{ secrets.APP_DIR }}
         run: |
-          rsync -avz --delete \
-            --exclude='node_modules' \
-            -e "ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT" \
-            .next/ "$VPS_USER@$VPS_IP:$APP_DIR/.next/"
-
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT" \
-            public/ "$VPS_USER@$VPS_IP:$APP_DIR/public/"
-
-          rsync -avz \
-            -e "ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT" \
-            package.json package-lock.json \
-            "$VPS_USER@$VPS_IP:$APP_DIR/"
-
-      # -------------------------
-      # 6. INSTALL + RESTART
-      # -------------------------
-      - name: Restart app on VPS
-        env:
-          VPS_PORT: ${{ secrets.VPS_PORT }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_IP: ${{ secrets.VPS_IP }}
-          APP_DIR: ${{ secrets.APP_DIR }}
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << 'EOF'
+          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << EOF
 
             set -e
 
@@ -96,15 +68,20 @@ jobs:
 
             cd /home/administrator/apps/students/releases/SL-Test-App
 
+            echo "📥 Pulling latest code..."
+            git pull origin main
+
             echo "📦 Installing deps..."
-            npm install --omit=dev
+            npm install
+
+            echo "🏗️ Building app..."
+            npm run build
 
             echo "♻️ Restarting app..."
             pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
 
             pm2 save
-            pm2 list
 
-            echo "✅ Frontend deployed!"
+            echo "✅ Deployment done!"
 
           EOF
