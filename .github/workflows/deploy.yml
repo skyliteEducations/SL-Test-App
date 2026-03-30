@@ -1,0 +1,100 @@
+name: Deploy Frontend (Next.js)
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------------
+      # 1. CHECKOUT
+      # -------------------------
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # -------------------------
+      # 2. SETUP NODE
+      # -------------------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # -------------------------
+      # 3. BUILD APP
+      # -------------------------
+      - name: Build Next.js app
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+        run: |
+          npm ci
+          npm run build
+
+      # -------------------------
+      # 4. SETUP SSH
+      # -------------------------
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
+      # -------------------------
+      # 5. DEPLOY TO VPS
+      # -------------------------
+      - name: Deploy build to VPS
+        env:
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_IP: ${{ secrets.VPS_IP }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          rsync -avz --delete \
+            --exclude='node_modules' \
+            -e "ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT" \
+            .next/ "$VPS_USER@$VPS_IP:$APP_DIR/.next/"
+
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT" \
+            public/ "$VPS_USER@$VPS_IP:$APP_DIR/public/"
+
+          rsync -avz \
+            -e "ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT" \
+            package.json package-lock.json \
+            "$VPS_USER@$VPS_IP:$APP_DIR/"
+
+      # -------------------------
+      # 6. INSTALL + RESTART
+      # -------------------------
+      - name: Restart app on VPS
+        env:
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_IP: ${{ secrets.VPS_IP }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << 'EOF'
+
+            set -e
+
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            cd $APP_DIR
+
+            echo "📦 Installing deps..."
+            npm ci --omit=dev
+
+            echo "♻️ Restarting app..."
+            pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
+
+            pm2 save
+            pm2 list
+
+            echo "✅ Frontend deployed!"
+
+          EOF
