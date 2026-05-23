@@ -146,13 +146,15 @@ import ComplaintDashboard from "./complain";
 import AnalyzeDashboard from "./analyze";
 import SettingsForms from "./settings";
 import FloatingActions from "../components/speedDial";
-
+import SpeedIcon from '@mui/icons-material/Speed';
+import ChapterWise from "./chapterWiseTest";
 export default function Dashboard() {
-  const [navigationOptions, setNavigationOption] = useState('All Tests')
+  const [navigationOptions, setNavigationOption] = useState('My Tests')
 
   const navItems = [
     { label: 'All Tests',    icon: <QuizIcon fontSize="small"/> },
     { label: 'My Tests',     icon: <TokenIcon fontSize="small"/> },
+    { label: 'Chapter tests',     icon: <SpeedIcon fontSize="small"/> },
     { label: 'Ask Doubts',   icon: <PsychologyIcon fontSize="small"/> },
     { label: 'Analyze',      icon: <DonutSmallIcon fontSize="small"/> },
     { label: 'Events',       icon: <CalendarMonthIcon fontSize="small"/> },
@@ -212,6 +214,8 @@ export default function Dashboard() {
           {navigationOptions === 'My complains' && <ComplaintDashboard />}
           {navigationOptions === 'Analyze'      && <AnalyzeDashboard />}
           {navigationOptions === 'Settings'     && <SettingsForms />}
+          {navigationOptions === 'Chapter tests'     && <ChapterWise />}
+
         </div>
       </div>
 
