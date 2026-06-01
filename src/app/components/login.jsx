@@ -97,7 +97,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
 
         <h1 className="text-3xl font-bold text-center text-teal-700">
-          Students Login
+          Students Login | Dev server
         </h1>
         <p className="text-center text-sm text-gray-500 mt-2">
           One Platform • All Competitive Exams
