@@ -51,7 +51,7 @@ jobs:
           npm run build
 
           pm2 delete students_dev_server || true
-          pm2 start /home/administrator/apps/students/dev_server/SL-Test-App/ecosystem.config.js
+          pm2 restart /home/administrator/apps/students/dev_server/SL-Test-App/ecosystem.config.js
           pm2 save
 
           EOF
@@ -80,7 +80,7 @@ jobs:
           npm install
           npm run build
 
-          pm2 restart skyliteeducations-prod || pm2 start ecosystem.config.js --only skyliteeducations-prod
+          pm2 restart skyliteeducations-prod || pm2 restart ecosystem.config.js --only skyliteeducations-prod
 
           pm2 save
 
