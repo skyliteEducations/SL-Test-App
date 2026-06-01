@@ -50,7 +50,7 @@ jobs:
           npm install
           npm run build
 
-          pm2 restart students_dev_server || pm2 start ecosystem.config.js --only students_dev_server
+          pm2 restart students_dev_server || pm2 start ecosystem.config2.js --only students_dev_server
 
           pm2 save
 
@@ -80,7 +80,7 @@ jobs:
           npm install
           npm run build
 
-          pm2 restart skyliteeducations-prod || pm2 start ecosystem.config.js --only skyliteeducations-prod
+          pm2 restart skyliteeducations-prod || pm2 start ecosystem.config2.js --only skyliteeducations-prod
 
           pm2 save
 
