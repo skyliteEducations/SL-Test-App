@@ -50,8 +50,8 @@ jobs:
           npm install
           npm run build
 
-          pm2 restart students_dev_server || pm2 start ecosystem.config2.js --only students_dev_server
-
+          pm2 delete students_dev_server || true
+          pm2 start /home/administrator/apps/students/dev_server/SL-Test-App/ecosystem.config2.js
           pm2 save
 
           EOF
