@@ -1,90 +1,95 @@
-name: Deploy Frontend (Next.js)
+name: Deploy Frontend
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - devserver
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: studentsCICD
 
     steps:
-      # -------------------------
-      # 1. CHECKOUT
-      # -------------------------
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # -------------------------
-      # 2. SETUP NODE
-      # -------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      # -------------------------
-      # 3. BUILD APP (optional)
-      # -------------------------
-      - name: Build Next.js app
-        env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
-        run: |
-          npm install
-          npm run build
-
-      # -------------------------
-      # 4. SETUP SSH
-      # -------------------------
       - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VPS_IP: ${{ secrets.VPS_IP }}
-          VPS_PORT: ${{ secrets.VPS_PORT }}
         run: |
           mkdir -p ~/.ssh
 
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          ssh-keyscan -H -p $VPS_PORT $VPS_IP >> ~/.ssh/known_hosts
+          ssh-keyscan -H -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
 
-      # -------------------------
-      # 5. DEPLOY & RESTART
-      # -------------------------
-      - name: Deploy & Restart
-        env:
-          VPS_PORT: ${{ secrets.VPS_PORT }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_IP: ${{ secrets.VPS_IP }}
+      #################################################
+      # DEV SERVER DEPLOYMENT
+      #################################################
+
+      - name: Deploy Dev Server
+        if: github.ref == 'refs/heads/devserver'
         run: |
-          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << 'EOF'
+          ssh -i ~/.ssh/id_ed25519 \
+            -p ${{ secrets.VPS_PORT }} \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
 
-            set -e
+          set -e
 
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-            cd /home/administrator/apps/students/releases/SL-Test-App
+          cd /home/administrator/apps/students/dev_server/SL-Test-App
 
-            echo "🧹 Cleaning old code..."
-            git fetch origin main
-            git reset --hard origin/main
-            git clean -fd
+          git fetch origin devserver
+          git reset --hard origin/devserver
+          git clean -fd
 
-            echo "🗑️ Removing old build..."
-            rm -rf .next node_modules   # ← YE ADD KARO
+          rm -rf .next
 
-            echo "📦 Installing deps..."
-            npm install
+          npm install
+          npm run build
 
-            echo "🏗️ Building app..."
-            npm run build
+          pm2 restart students_dev_server
 
-            echo "♻️ Restarting app..."
-            pm2 restart skyliteeducations || pm2 start npm --name "skyliteeducations" -- star
+          pm2 save
 
-            pm2 save
+          EOF
+
+      #################################################
+      # PRODUCTION DEPLOYMENT
+      #################################################
+
+      - name: Deploy Production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            -p ${{ secrets.VPS_PORT }} \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
+
+          set -e
+
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+          cd /home/administrator/apps/students/prod_server/SL-Test-App
+
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
+
+          rm -rf .next
+
+          npm install
+          npm run build
+
+          pm2 restart skyliteeducations-prod
+
+          pm2 save
 
           EOF
