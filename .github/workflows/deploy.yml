@@ -1,8 +1,10 @@
-name: Deploy Frontend (Next.js)
+name: Deploy Frontend
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - devserver
 
 jobs:
   deploy:
@@ -10,81 +12,76 @@ jobs:
     environment: studentsCICD
 
     steps:
-      # -------------------------
-      # 1. CHECKOUT
-      # -------------------------
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # -------------------------
-      # 2. SETUP NODE
-      # -------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      # -------------------------
-      # 3. BUILD APP (optional)
-      # -------------------------
-      - name: Build Next.js app
-        env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+      - name: Setup SSH
         run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Deploy Dev Server
+        if: github.ref == 'refs/heads/devserver'
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_ed25519 \
+              -p "${{ secrets.VPS_PORT }}" \
+              "${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}" << 'EOF'
+
+          set -e
+
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+          cd /home/administrator/apps/students/dev_server/SL-Test-App
+
+          git fetch origin devserver
+          git reset --hard origin/devserver
+          git clean -fd
+
+          rm -rf .next
+
           npm install
           npm run build
 
-      # -------------------------
-      # 4. SETUP SSH
-      # -------------------------
-      - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VPS_IP: ${{ secrets.VPS_IP }}
-          VPS_PORT: ${{ secrets.VPS_PORT }}
+          pm2 delete students_dev_server || true
+          pm2 restart /home/administrator/apps/students/dev_server/SL-Test-App/ecosystem.config.js
+          pm2 save
+
+          EOF
+
+      - name: Deploy Production
+        if: github.ref == 'refs/heads/main'
         run: |
-          mkdir -p ~/.ssh
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_ed25519 \
+              -p "${{ secrets.VPS_PORT }}" \
+              "${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}" << 'EOF'
 
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          set -e
 
-          ssh-keyscan -H -p $VPS_PORT $VPS_IP >> ~/.ssh/known_hosts
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-      # -------------------------
-      # 5. DEPLOY & RESTART
-      # -------------------------
-      - name: Deploy & Restart
-        env:
-          VPS_PORT: ${{ secrets.VPS_PORT }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_IP: ${{ secrets.VPS_IP }}
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -p $VPS_PORT $VPS_USER@$VPS_IP << 'EOF'
+          cd /home/administrator/apps/students/prod_server/SL-Test-App
 
-            set -e
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
 
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          rm -rf .next
 
-            cd /home/administrator/apps/students/releases/SL-Test-App
+          npm install
+          npm run build
 
-            echo "🧹 Cleaning old code..."
-            git fetch origin main
-            git reset --hard origin/main
-            git clean -fd
+          pm2 restart students_prod_server || pm2 restart ecosystem.config.js --only students_prod_server
 
-            echo "🗑️ Removing old build..."
-            rm -rf .next node_modules   # ← YE ADD KARO
-
-            echo "📦 Installing deps..."
-            npm install
-
-            echo "🏗️ Building app..."
-            npm run build
-
-            echo "♻️ Restarting app..."
-            pm2 restart skyliteeducations || pm2 start npm --name "skyliteeducations" -- star
-
-            pm2 save
+          pm2 save
 
           EOF
