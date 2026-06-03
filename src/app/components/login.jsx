@@ -1,12 +1,17 @@
 import { useState, useContext  } from "react";
 import { AuthContext } from "@/contexts/login.context";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function Login() {
   const router = useRouter()
-  const { user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndLoginStudents } = useContext(AuthContext);
+  const { user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword , openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP, BackToForgotPasswordOTPSending} = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+  });
+  const [newPasswordForm, setNewPasswordForm] = useState({
+    newPassword: "",
+    confirmPassword: "",
   });
   const [otp,setotp] = useState('')
   const [forgotPassEmail, setForgotPassEmail] = useState('')
@@ -20,15 +25,60 @@ export default function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const login=LoginStudents(formData.email, formData.password)
+    const login= await LoginStudents(formData.email, formData.password)
     console.log(login)
     if(login){
-      router.push("/dashbaord")
+      router.push("/dashboard")
     }
     // console.log(formData);
   };
+
+  function openForgotPasswordPanelFun(e){
+    e.preventDefault()
+    openForgotPasswordPanel()
+  }
+
+  function forgotPasswordOTPSendingFUn(e){
+    e.preventDefault()
+    forgotPasswordOTPSending(forgotPassEmail)
+  }
+
+  function verifyOTP(e){
+    e.preventDefault()
+    OTPVerificationAndForgotPassword(forgotPassEmail,otp)
+  }
+
+  function newPasswordChange(e){
+    setNewPasswordForm((prev)=>({
+      ...prev,
+      newPassword : e.target.value
+    }))
+  }
+
+  function newPasswordConfirmChange(e){
+    setNewPasswordForm((prev)=>({
+      ...prev,
+      confirmPassword : e.target.value
+    }))
+  }
+
+  function changePassword(e){
+    e.preventDefault()
+    settingNewPasswordForgot(forgotPassEmail, newPasswordForm.newPassword, newPasswordForm.confirmPassword)
+  }
+
+  function resendOTPFun(e){
+    e.preventDefault()
+    console.log("lo")
+    resendOTP()
+  }
+
+  function BackToForgotPasswordOTPSendingFun(e){
+    e.preventDefault()
+    BackToForgotPasswordOTPSending()
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-50">
@@ -70,7 +120,7 @@ export default function Login() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form className="space-y-5">
               {/* Email */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -96,6 +146,7 @@ export default function Login() {
 
                   <button
                     type="button"
+                    onClick={openForgotPasswordPanelFun}
                     className="cursor-pointer text-sm font-medium text-teal-600 hover:text-teal-700"
                     >
                     Forgot Password?
@@ -117,7 +168,7 @@ export default function Login() {
 
               {/* Button */}
               <button
-                type="submit"
+                onClick={handleSubmit}
                 className="cursor-pointer w-full rounded-xl bg-teal-600 py-3 font-semibold text-white transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-200"
                 >
                 Sign In
@@ -127,9 +178,9 @@ export default function Login() {
             {/* Footer */}
             <div className="mt-8 text-center text-sm text-slate-500">
               Don't have an account?{" "}
-              <button className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700">
+              <Link href="https://skycbt.com/signup" className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700">
                 Create Account
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -153,7 +204,7 @@ export default function Login() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form className="space-y-5">
                 {/* OTP */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -199,7 +250,7 @@ export default function Login() {
 
                 {/* Verify Button */}
                 <button
-                  type="submit"
+                  // type="submit"
                   className="cursor-pointer w-full rounded-xl bg-teal-600 py-3 font-semibold text-white transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-200"
                 >
                   Verify OTP
@@ -211,6 +262,7 @@ export default function Login() {
                 Didn't receive the code?{" "}
                 <button
                   type="button"
+                  onClick={resendOTPFun}
                   className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700"
                 >
                   Resend OTP
@@ -237,7 +289,7 @@ export default function Login() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form className="space-y-5">
                 {/* Email */}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -276,7 +328,8 @@ export default function Login() {
 
                 {/* Button */}
                 <button
-                  type="submit"
+                  // type="submit"
+                  onClick={forgotPasswordOTPSendingFUn}
                   className="
                     cursor-pointer
                     w-full
@@ -300,6 +353,7 @@ export default function Login() {
               <div className="mt-6 text-center">
                 <button
                   type="button"
+                  onClick={BackToLogin}
                   className="
                     cursor-pointer
                     text-sm
@@ -332,7 +386,7 @@ export default function Login() {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form className="space-y-5">
                   
                   {/* OTP Input */}
                   <div>
@@ -344,7 +398,7 @@ export default function Login() {
                       type="text"
                       name="otp"
                       value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
+                      onChange={(e) => setotp(e.target.value)}
                       placeholder="● ● ● ● ● ●"
                       maxLength={6}
                       className="
@@ -379,7 +433,7 @@ export default function Login() {
 
                   {/* Verify Button */}
                   <button
-                    type="submit"
+                    onClick={verifyOTP}
                     className="
                       cursor-pointer
                       w-full
@@ -404,6 +458,7 @@ export default function Login() {
                   Didn't receive the code?{" "}
                   <button
                     type="button"
+                    onClick={resendOTP}
                     className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700"
                   >
                     Resend Code
@@ -413,6 +468,7 @@ export default function Login() {
                 <div className="mt-3 text-center">
                   <button
                     type="button"
+                    onClick={BackToForgotPasswordOTPSendingFun}
                     className="cursor-pointer text-sm font-medium text-slate-500 hover:text-slate-700"
                   >
                     Back
@@ -450,8 +506,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="newPassword"
-                  // value={formData.newPassword}
-                  // onChange={handleChange}
+                  value={newPasswordForm.newPassword}
+                  onChange={newPasswordChange}
                   placeholder="Enter new password"
                   className="
                     w-full
@@ -486,8 +542,8 @@ export default function Login() {
                 <input
                   type="password"
                   name="confirmPassword"
-                  // value={formData.confirmPassword}
-                  // onChange={handleChange}
+                  value={newPasswordForm.confirmPassword}
+                  onChange={newPasswordConfirmChange}
                   placeholder="Confirm new password"
                   className="
                     w-full
@@ -515,7 +571,7 @@ export default function Login() {
 
               {/* Reset Button */}
               <button
-                type="submit"
+                onClick={changePassword}
                 className="
                   cursor-pointer
                   w-full
@@ -538,7 +594,7 @@ export default function Login() {
             {/* Footer */}
             <div className="mt-6 text-center text-sm text-slate-500">
               Remember your password?{" "}
-              <button className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700">
+              <button onClick={BackToLogin} className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700">
                 Back to Login
               </button>
             </div>

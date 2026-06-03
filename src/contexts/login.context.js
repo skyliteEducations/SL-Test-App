@@ -48,103 +48,277 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const LoginStudents = (email,password)=>{
-    setLoading(Loading=> true)
-    axios({
-        method: "POST",
-        url: "http://localhost:5001/api/v1/students/login",
-        data: {
-            email,
-            password
-        }
-    })
-    .then((res) => {
-        if (res.data.success) {
-            AlertPeep('success', "Login successfully");
+    const LoginStudents = async (email, password) => {
+        try {
+            setLoading(true);
+
+            const res = await axios.post(
+                "http://localhost:5001/api/v1/students/login",
+                {
+                    email,
+                    password
+                }
+            );
+
+            if (res.data.success) {
+                AlertPeep('success', "Login successfully");
+
+                setLoginOTPSend(false);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(false);
+                SetSettingNewPassword(false);
+
+                return true;
+            } else {
+                AlertPeep('error', res.data.message);
+                return false;
+            }
+        } catch (err) {
+            AlertPeep(
+                'error',
+                err.response?.data?.message || "Something went wrong"
+            );
+
             setLoginOTPSend(false);
-            setLoginScreen(false);
+            setLoginScreen(true);
             setForgotPassword(false);
             setForgotPasswordOTP(false);
             SetSettingNewPassword(false);
-            return true
 
-        } else {
-            AlertPeep('error', res.data.message);
-            return false
+            return false;
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
+    };
 
-    })
-    .catch((err) => {
-        AlertPeep(
-            'error',
-            err.response?.data?.message || "Something went wrong"
-        );
+    const forgotPasswordOTPSending = async (email) => {
+        try {
+            setLoading(true);
 
+            const res = await axios.post(
+                "http://localhost:5001/api/v1/students/forgot",
+                {
+                    email
+                }
+            );
+
+            if (res.data.success) {
+                AlertPeep('success', "OTP send to your Email Id");
+
+                setLoginOTPSend(false);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(true);
+                SetSettingNewPassword(false);
+
+                return true;
+            } else {
+                AlertPeep('error', res.data.message);
+                return false;
+            }
+        } catch (err) {
+            AlertPeep(
+                'error',
+                err.response?.data?.message || "Something went wrong"
+            );
+
+            setLoginOTPSend(false);
+            setLoginScreen(false);
+            setForgotPassword(true);
+            setForgotPasswordOTP(false);
+            SetSettingNewPassword(false);
+
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const openForgotPasswordPanel = async()=>{
         setLoginOTPSend(false);
-        setLoginScreen(true);
-        setForgotPassword(false);
+        setLoginScreen(false);
+        setForgotPassword(true);
         setForgotPasswordOTP(false);
         SetSettingNewPassword(false);
-        setLoading(false);
-        return false
+    }
 
-    });
-  }
+    const OTPVerificationAndForgotPassword = async (email, otp) => {
+        try {
+            setLoading(true);
 
-    const OTPVerificationAndLoginStudents = async (otp) => {
-    try {
-        setLoading(true);
+            const res = await axios.post(
+                "http://localhost:5001/api/v1/students/verify-forgot-password-otp",
+                { email,otp },
+                // {
+                //     withCredentials: true,
+                // }
+            );
 
-        const res = await axios.post(
-            "http://localhost:5001/api/v1/students/otp",
-            { otp },
-            {
-                withCredentials: true,
+            if (res.data.success) {
+
+                AlertPeep("success", "OTP successfully verified");
+                setLoginOTPSend(false);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(false);
+                SetSettingNewPassword(true);
+
+            } else {
+
+                AlertPeep("error", "Invalid OTP");
+
+                setLoginOTPSend(true);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(false);
+                SetSettingNewPassword(false);
             }
-        );
 
-        if (res.data.success) {
+        } catch (err) {
 
-            AlertPeep("success", "OTP successfully verified");
-            setLoginOTPSend(false);
-            setLoginScreen(false);
-            setForgotPassword(false);
-            setForgotPasswordOTP(false);
-            SetSettingNewPassword(false);
+            AlertPeep(
+                "error",
+                err.response?.data?.message || "Something went wrong"
+            );
 
-        } else {
-
-            AlertPeep("error", "Invalid OTP");
+            console.log(err);
 
             setLoginOTPSend(true);
             setLoginScreen(false);
             setForgotPassword(false);
             setForgotPasswordOTP(false);
             SetSettingNewPassword(false);
+
+        } finally {
+
+            setLoading(false);
+
         }
+    };
 
-    } catch (err) {
+    const settingNewPasswordForgot = async (email, newPassword, confirmPassword) => {
+        try {
+            setLoading(true);
 
-        AlertPeep(
-            "error",
-            err.response?.data?.message || "Something went wrong"
-        );
+            const res = await axios.post(
+                "http://localhost:5001/api/v1/students/reset",
+                { email, newPassword, confirmPassword},
+                // {
+                //     withCredentials: true,
+                // }
+            );
 
-        console.log(err);
+            if (res.data.success) {
 
-        setLoginOTPSend(true);
-        setLoginScreen(false);
+                AlertPeep("success", "Password changed successfully");
+                setLoginOTPSend(false);
+                setLoginScreen(true);
+                setForgotPassword(false);
+                setForgotPasswordOTP(false);
+                SetSettingNewPassword(false);
+
+            } else {
+
+                AlertPeep("error", "Invalid OTP");
+
+                setLoginOTPSend(false);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(false);
+                SetSettingNewPassword(true);
+            }
+
+        } catch (err) {
+
+            AlertPeep(
+                "error",
+                err.response?.data?.message || "Something went wrong"
+            );
+
+            console.log(err);
+
+            setLoginOTPSend(false);
+            setLoginScreen(false);
+            setForgotPassword(false);
+            setForgotPasswordOTP(false);
+            SetSettingNewPassword(true);
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
+
+    const resendOTP = async () => {
+        try {
+            setLoading(true);
+
+            const res = await axios.post(
+                "http://localhost:5001/api/v1/students/resend-otp",
+                {
+                    withCredentials: true,
+                }
+            );
+
+            if (res.data.success) {
+
+                AlertPeep("success", "OTP send to your Email Id");
+                setLoginOTPSend(false);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(true);
+                SetSettingNewPassword(false);
+
+            } else {
+
+                AlertPeep("error", "Invalid OTP");
+
+                setLoginOTPSend(false);
+                setLoginScreen(false);
+                setForgotPassword(false);
+                setForgotPasswordOTP(true);
+                SetSettingNewPassword(false);
+            }
+
+        } catch (err) {
+
+            AlertPeep(
+                "error",
+                err.response?.data?.message || "Something went wrong"
+            );
+
+            console.log(err);
+
+            setLoginOTPSend(false);
+            setLoginScreen(false);
+            setForgotPassword(false);
+            setForgotPasswordOTP(true);
+            SetSettingNewPassword(false);
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
+    const BackToLogin = async()=>{
+        setLoginOTPSend(false);
+        setLoginScreen(true);
         setForgotPassword(false);
         setForgotPasswordOTP(false);
         SetSettingNewPassword(false);
-
-    } finally {
-
-        setLoading(false);
-
     }
-};
+    const BackToForgotPasswordOTPSending = async()=>{
+        setLoginOTPSend(false);
+        setLoginScreen(false);
+        setForgotPassword(true);
+        setForgotPasswordOTP(false);
+        SetSettingNewPassword(false);
+    }
 
     const setPinOnFirstLOgin = async(pin, id)=>{
         try {
@@ -201,7 +375,7 @@ export const AuthProvider = ({ children }) => {
     }
 
   return (
-    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndLoginStudents }}>
+    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword, openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP , BackToForgotPasswordOTPSending}}>
       {children}
     </AuthContext.Provider>
   );
