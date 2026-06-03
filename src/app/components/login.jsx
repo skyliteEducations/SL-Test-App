@@ -1,256 +1,553 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useState, useContext  } from "react";
 import { AuthContext } from "@/contexts/login.context";
-import Loader from "./loader";
+import { useRouter } from "next/navigation";
+export default function Login() {
+  const router = useRouter()
+  const { user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndLoginStudents } = useContext(AuthContext);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [otp,setotp] = useState('')
+  const [forgotPassEmail, setForgotPassEmail] = useState('')
 
-export default function LoginPage() {
-  const router = useRouter();
-  
-  const {user,tempId, loginWithPinDirectly,moutingLoginChecks, LoginStudents, setPinOnFirstLOgin,OTPVerificationAndLoginStudents,Loading, firstLogin} = useContext(AuthContext)
-  const [loginWithPin, setLoginWithPin] = useState(false)
-  const [loginOrOTPPanel, setLoginOrOTPPanel] = useState(true);
-  const [openingSetPin, setOpenSetPin] = useState(false)
+  const handleChange = (e) => {
+    const { name, value, checked, type } = e.target;
 
-  useEffect(() => {
-  const fetchData = async () => {
-    const data = await moutingLoginChecks();
-    console.log(data);
-
-    if (data) {
-      if (data.firstLogin) {
-        console.log("pin");
-        setOpenSetPin(true);
-      } else {
-        setLoginWithPin(true);
-      }
-    } else {
-      setLoginWithPin(false);
-      setOpenSetPin(false);
-      setLoginOrOTPPanel(true);
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  fetchData();
-}, []);
-
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [otp, setOtp] = useState("");
-  const [pin, setPin] = useState("");
-  const [logPin, setLogPin] = useState("");
-
-
-
-  const handleLogin = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    LoginStudents(loginForm.email, loginForm.password)
-    setLoginOrOTPPanel(loginOrOTPPanel=> false)
+    const login=LoginStudents(formData.email, formData.password)
+    console.log(login)
+    if(login){
+      router.push("/dashbaord")
+    }
+    // console.log(formData);
   };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-
-    console.log("OTP:", otp);
-
-    const data = await OTPVerificationAndLoginStudents(otp, tempId); // ✅ await
-
-    console.log("DATA:", data);
-
-    if (data) {
-      if (data.firstLogin) {
-        console.log("pin");
-        setOpenSetPin(true);
-      } else {
-        router.push("/dashboard");
-      }
-    }
-  };
-
-  const handlePinSetup = async(e) => {
-    e.preventDefault()
-    const data = await setPinOnFirstLOgin(pin, tempId)
-    if (data) {
-      if (!(data.firstLogin)) {
-        
-        router.push("/dashboard");
-      } else {
-        // console.log("pin");
-        setOpenSetPin(true);
-      }
-    }
-  }
-
-  const LoginWithPin = async(e)=>{
-    e.preventDefault()
-    const data = await loginWithPinDirectly(logPin)
-    if (data=='success') {
-        router.push("/dashboard");
-    }else{
-      console.log("Incorrect Pin")
-    }
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <div className="relative min-h-screen overflow-hidden bg-slate-50">
+      {/* Background Blur Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-teal-300/30 blur-3xl animate-pulse" />
 
-        <h1 className="text-3xl font-bold text-center text-teal-700">
-            Dev server | QA Testing
-        </h1>
-        <p className="text-center text-sm text-gray-500 mt-2">
-          One Platform • All Competitive Exams
-        </p>
+        <div className="absolute right-0 top-1/4 h-[28rem] w-[28rem] rounded-full bg-cyan-300/20 blur-3xl animate-pulse" />
 
-        {(loginOrOTPPanel) ? (
-          <>
-            {(!openingSetPin && !loginWithPin) &&
-              <form onSubmit={handleLogin} className="mt-8 space-y-5">
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-gray-600">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={loginForm.email}
-                    onChange={(e) =>
-                      setLoginForm((prev) => ({ ...prev, email: e.target.value }))
-                    }
-                    placeholder="student@example.com"
-                    className="px-4 py-3 text-black rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition"
-                    />
-                </div>
+        <div className="absolute bottom-0 left-1/2 h-[25rem] w-[25rem] -translate-x-1/2 rounded-full bg-emerald-200/30 blur-3xl animate-pulse" />
+      </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-gray-600">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={loginForm.password}
-                    onChange={(e) =>
-                      setLoginForm((prev) => ({ ...prev, password: e.target.value }))
-                    }
-                    placeholder="••••••••"
-                    className="px-4 py-3 text-black rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition"
-                    />
-                </div>
+      {/* Grid Background */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #000 1px, transparent 1px),
+            linear-gradient(to bottom, #000 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+        }}
+      />
 
-                <button
-                  type="submit"
-                  className="cursor-pointer w-full py-3 rounded-lg bg-teal-600 text-white font-semibold shadow-md hover:bg-teal-700 transition"
-                  >
-                  {Loading ? <Loader/> :"Login to Dashboard"}
-                </button>
-              </form>
-              }
-          </>
-        ) : (
-          <>
-          {(!openingSetPin && !loginWithPin) &&
-            <form onSubmit={handleVerifyOtp} className="mt-8 space-y-5">
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-600">
-                  Enter OTP
+      {loginScreen &&
+      (
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          {/* Card */}
+          <div className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+            {/* Heading */}
+            <div className="mb-8">
+              <h1 className="text-3xl text-center font-bold text-slate-900">
+                Dev Server | QA Testing
+              </h1>
+
+              <p className="mt-2 text-center text-slate-500">
+                Sign in to continue to your account
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Email Address
                 </label>
+
                 <input
-                  type="text"
-                  required
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter 6-digit OTP"
-                  className="px-4 py-3 text-black rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-center tracking-widest"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-100"
                   />
               </div>
 
-              <div className="text-right">
+              {/* Password */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-slate-700">
+                    Password
+                  </label>
+
+                  <button
+                    type="button"
+                    className="cursor-pointer text-sm font-medium text-teal-600 hover:text-teal-700"
+                    >
+                    Forgot Password?
+                  </button>
+                </div>
+
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-100"
+                  />
+              </div>
+
+              {/* Remember Me */}
+              
+
+              {/* Button */}
+              <button
+                type="submit"
+                className="cursor-pointer w-full rounded-xl bg-teal-600 py-3 font-semibold text-white transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-200"
+                >
+                Sign In
+              </button>
+            </form>
+
+            {/* Footer */}
+            <div className="mt-8 text-center text-sm text-slate-500">
+              Don't have an account?{" "}
+              <button className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700">
+                Create Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      )
+      }
+
+      {loginOTPSend && (
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+          <div className="w-full max-w-md">
+            {/* Card */}
+            <div className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+              {/* Heading */}
+              <div className="mb-8">
+                <h1 className="text-3xl text-center font-bold text-slate-900">
+                  OTP Verification
+                </h1>
+
+                <p className="mt-2 text-center text-slate-500">
+                  Enter the verification code sent to your email
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* OTP */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Verification Code
+                  </label>
+
+                  <input
+                    type="text"
+                    name="otp"
+                    value={otp}
+                    onChange={(e) => setotp(e.target.value)}
+                    placeholder="● ● ● ● ● ●"
+                    maxLength={6}
+                    className="
+                      w-full
+                      rounded-2xl
+                      border
+                      border-slate-200
+                      bg-gradient-to-b
+                      from-white
+                      to-slate-50
+                      px-5
+                      py-4
+                      text-center
+                      text-2xl
+                      font-bold
+                      tracking-[0.5em]
+                      text-slate-800
+                      shadow-sm
+                      outline-none
+                      transition-all
+                      duration-300
+                      placeholder:text-slate-300
+                      focus:border-teal-500
+                      focus:bg-white
+                      focus:shadow-lg
+                      focus:shadow-teal-100
+                      focus:ring-4
+                      focus:ring-teal-100
+                    "
+                  />
+                </div>
+
+                {/* Verify Button */}
+                <button
+                  type="submit"
+                  className="cursor-pointer w-full rounded-xl bg-teal-600 py-3 font-semibold text-white transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-200"
+                >
+                  Verify OTP
+                </button>
+              </form>
+
+              {/* Resend */}
+              <div className="mt-6 text-center text-sm text-slate-500">
+                Didn't receive the code?{" "}
                 <button
                   type="button"
-                  className="text-sm text-teal-600 hover:underline cursor-pointer"
-                  >
+                  className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700"
+                >
                   Resend OTP
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {forgotPassword && (
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+          <div className="w-full max-w-md">
+            {/* Card */}
+            <div className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+              {/* Heading */}
+              <div className="mb-8">
+                <h1 className="text-3xl text-center font-bold text-slate-900">
+                  Forgot Password
+                </h1>
+
+                <p className="mt-2 text-center text-slate-500">
+                  Enter your email address and we'll send you a verification code
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Email */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Email Address
+                  </label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    value={forgotPassEmail}
+                    onChange={(e) => setForgotPassEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="
+                      w-full
+                      rounded-2xl
+                      border
+                      border-slate-200
+                      bg-gradient-to-b
+                      from-white
+                      to-slate-50
+                      px-4
+                      py-3
+                      text-slate-900
+                      outline-none
+                      transition-all
+                      duration-300
+                      focus:border-teal-500
+                      focus:bg-white
+                      focus:ring-4
+                      focus:ring-teal-100
+                      focus:shadow-lg
+                      focus:shadow-teal-100
+                    "
+                  />
+                </div>
+
+                {/* Button */}
+                <button
+                  type="submit"
+                  className="
+                    cursor-pointer
+                    w-full
+                    rounded-xl
+                    bg-teal-600
+                    py-3
+                    font-semibold
+                    text-white
+                    transition-all
+                    duration-300
+                    hover:bg-teal-700
+                    hover:shadow-lg
+                    hover:shadow-teal-200
+                  "
+                >
+                  Send Verification Code
+                </button>
+              </form>
+
+              {/* Footer */}
+              <div className="mt-6 text-center">
+                <button
+                  type="button"
+                  className="
+                    cursor-pointer
+                    text-sm
+                    font-medium
+                    text-teal-600
+                    hover:text-teal-700
+                  "
+                >
+                  Back to Login
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {forgotPasswordOTP && (
+          <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+            <div className="w-full max-w-md">
+              <div className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+                
+                {/* Heading */}
+                <div className="mb-8">
+                  <h1 className="text-3xl text-center font-bold text-slate-900">
+                    Verify Reset Code
+                  </h1>
+
+                  <p className="mt-2 text-center text-slate-500">
+                    Enter the verification code sent to your email to continue password reset
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  
+                  {/* OTP Input */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      Verification Code
+                    </label>
+
+                    <input
+                      type="text"
+                      name="otp"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="● ● ● ● ● ●"
+                      maxLength={6}
+                      className="
+                        w-full
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        bg-gradient-to-b
+                        from-white
+                        to-slate-50
+                        px-5
+                        py-4
+                        text-center
+                        text-2xl
+                        font-bold
+                        tracking-[0.5em]
+                        text-slate-800
+                        shadow-sm
+                        outline-none
+                        transition-all
+                        duration-300
+                        placeholder:text-slate-300
+                        focus:border-teal-500
+                        focus:bg-white
+                        focus:ring-4
+                        focus:ring-teal-100
+                        focus:shadow-lg
+                        focus:shadow-teal-100
+                      "
+                    />
+                  </div>
+
+                  {/* Verify Button */}
+                  <button
+                    type="submit"
+                    className="
+                      cursor-pointer
+                      w-full
+                      rounded-xl
+                      bg-teal-600
+                      py-3
+                      font-semibold
+                      text-white
+                      transition-all
+                      duration-300
+                      hover:bg-teal-700
+                      hover:shadow-lg
+                      hover:shadow-teal-200
+                    "
+                  >
+                    Verify Code
+                  </button>
+                </form>
+
+                {/* Footer */}
+                <div className="mt-6 text-center text-sm text-slate-500">
+                  Didn't receive the code?{" "}
+                  <button
+                    type="button"
+                    className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700"
+                  >
+                    Resend Code
+                  </button>
+                </div>
+
+                <div className="mt-3 text-center">
+                  <button
+                    type="button"
+                    className="cursor-pointer text-sm font-medium text-slate-500 hover:text-slate-700"
+                  >
+                    Back
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+      )}
+
+      {settingNewPassword && (
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-2xl backdrop-blur-xl">
+
+            {/* Heading */}
+            <div className="mb-8">
+              <h1 className="text-3xl text-center font-bold text-slate-900">
+                Create New Password
+              </h1>
+
+              <p className="mt-2 text-center text-slate-500">
+                Your identity has been verified. Set a new password for your account.
+              </p>
+            </div>
+
+            <form  className="space-y-5">
+
+              {/* New Password */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  New Password
+                </label>
+
+                <input
+                  type="password"
+                  name="newPassword"
+                  // value={formData.newPassword}
+                  // onChange={handleChange}
+                  placeholder="Enter new password"
+                  className="
+                    w-full
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    bg-gradient-to-b
+                    from-white
+                    to-slate-50
+                    px-4
+                    py-3
+                    text-slate-900
+                    outline-none
+                    transition-all
+                    duration-300
+                    focus:border-teal-500
+                    focus:bg-white
+                    focus:ring-4
+                    focus:ring-teal-100
+                    focus:shadow-lg
+                    focus:shadow-teal-100
+                  "
+                />
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Confirm Password
+                </label>
+
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  // value={formData.confirmPassword}
+                  // onChange={handleChange}
+                  placeholder="Confirm new password"
+                  className="
+                    w-full
+                    rounded-2xl
+                    border
+                    border-slate-200
+                    bg-gradient-to-b
+                    from-white
+                    to-slate-50
+                    px-4
+                    py-3
+                    text-slate-900
+                    outline-none
+                    transition-all
+                    duration-300
+                    focus:border-teal-500
+                    focus:bg-white
+                    focus:ring-4
+                    focus:ring-teal-100
+                    focus:shadow-lg
+                    focus:shadow-teal-100
+                  "
+                />
+              </div>
+
+              {/* Reset Button */}
               <button
                 type="submit"
-                className="cursor-pointer w-full py-3 rounded-lg bg-teal-600 text-white font-semibold shadow-md hover:bg-teal-700 transition"
-                >
-                
-                {Loading ? <Loader/> :"Verify OTP"}
-
+                className="
+                  cursor-pointer
+                  w-full
+                  rounded-xl
+                  bg-teal-600
+                  py-3
+                  font-semibold
+                  text-white
+                  transition-all
+                  duration-300
+                  hover:bg-teal-700
+                  hover:shadow-lg
+                  hover:shadow-teal-200
+                "
+              >
+                Reset Password
               </button>
             </form>
-              }
-              </>
-        )}
 
-        {openingSetPin &&
-          <form onSubmit={handlePinSetup} className="mt-8 space-y-5">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-600">
-                Set your PIN for Login
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={6}
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                placeholder="Enter 6-digit PIN"
-                className="px-4 py-3 text-black rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-center tracking-widest"
-              />
+            {/* Footer */}
+            <div className="mt-6 text-center text-sm text-slate-500">
+              Remember your password?{" "}
+              <button className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700">
+                Back to Login
+              </button>
             </div>
 
-
-            <button
-              type="submit"
-              className="cursor-pointer w-full py-3 rounded-lg bg-teal-600 text-white font-semibold shadow-md hover:bg-teal-700 transition"
-            >
-              
-              {Loading ? <Loader/> :"Set PIN"}
-
-            </button>
-          </form>
-        }
-
-        {loginWithPin &&
-          <form onSubmit={LoginWithPin} className="mt-8 space-y-5">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-600">
-                Enter PIN To Login
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={6}
-                value={logPin}
-                onChange={(e) => setLogPin(e.target.value)}
-                placeholder="Enter 6-digit PIN"
-                className="px-4 py-3 text-black rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition text-center tracking-widest"
-              />
-            </div>
-
-
-            <button
-              type="submit"
-              className="cursor-pointer w-full py-3 rounded-lg bg-teal-600 text-white font-semibold shadow-md hover:bg-teal-700 transition"
-            >
-              
-              {Loading ? <Loader/> :"Login"}
-
-            </button>
-          </form>
-        }
-
-        <div className="mt-6 text-center text-xs text-gray-400">
-          Trusted by Aspirants Across India 🇮🇳
+          </div>
         </div>
       </div>
+      )}
+
     </div>
   );
 }

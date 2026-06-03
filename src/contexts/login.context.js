@@ -3,7 +3,7 @@
 
 import { createContext, useState } from "react";
 import axios from "axios";
-
+import AlertPeep from "@/app/utility/alert";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -11,6 +11,13 @@ export const AuthProvider = ({ children }) => {
   const [tempId, setTempId] = useState('')
   const [Loading, setLoading] = useState(false)
   const [firstLogin, setFirstLogin] = useState('')
+  const [loginScreen, setLoginScreen] = useState(true)
+  const [loginOTPSend, setLoginOTPSend] = useState(false)
+  const [forgotPassword, setForgotPassword] = useState(false)
+  const [forgotPasswordOTP, setForgotPasswordOTP] = useState(false)
+  const [settingNewPassword, SetSettingNewPassword] = useState(false)
+
+
 
   const moutingLoginChecks = async()=>{
     try {
@@ -44,50 +51,100 @@ export const AuthProvider = ({ children }) => {
   const LoginStudents = (email,password)=>{
     setLoading(Loading=> true)
     axios({
-        method : "POST",
-        url : "http://localhost:5000/api/v1/account/login",
-        data : {
+        method: "POST",
+        url: "http://localhost:5001/api/v1/students/login",
+        data: {
             email,
             password
         }
-    }).then(res=>{
-        console.log(res)
-        setUser(user=> res.data)
-        console.log(res.data.id)
-        setTempId(tempId=> res.data.id)
-        setLoading(Loading=> false)
+    })
+    .then((res) => {
+        if (res.data.success) {
+            AlertPeep('success', "Login successfully");
+            setLoginOTPSend(false);
+            setLoginScreen(false);
+            setForgotPassword(false);
+            setForgotPasswordOTP(false);
+            SetSettingNewPassword(false);
+            return true
+
+        } else {
+            AlertPeep('error', res.data.message);
+            return false
+        }
+        setLoading(false);
 
     })
+    .catch((err) => {
+        AlertPeep(
+            'error',
+            err.response?.data?.message || "Something went wrong"
+        );
+
+        setLoginOTPSend(false);
+        setLoginScreen(true);
+        setForgotPassword(false);
+        setForgotPasswordOTP(false);
+        SetSettingNewPassword(false);
+        setLoading(false);
+        return false
+
+    });
   }
 
-    const OTPVerificationAndLoginStudents = async (otp, id) => {
-        try {
-            setLoading(true);
+    const OTPVerificationAndLoginStudents = async (otp) => {
+    try {
+        setLoading(true);
 
-            const res = await axios.post(
-            "http://localhost:5000/api/v1/account/otp-verification",
-            { otp, id },
+        const res = await axios.post(
+            "http://localhost:5001/api/v1/students/otp",
+            { otp },
             {
-                withCredentials: true, // ✅ MUST
+                withCredentials: true,
             }
-            );
+        );
 
-            setLoading(false);
+        if (res.data.success) {
 
-            if (res.data.status === "success") {
-            setUser(res.data.user);
-            setFirstLogin(res.data.user.firstLogin);
+            AlertPeep("success", "OTP successfully verified");
+            setLoginOTPSend(false);
+            setLoginScreen(false);
+            setForgotPassword(false);
+            setForgotPasswordOTP(false);
+            SetSettingNewPassword(false);
 
-            return res.data.user; // ✅ correct
-            } else {
-            return null;
-            }
-        } catch (err) {
-            setLoading(false);
-            console.log(err);
-            return null;
+        } else {
+
+            AlertPeep("error", "Invalid OTP");
+
+            setLoginOTPSend(true);
+            setLoginScreen(false);
+            setForgotPassword(false);
+            setForgotPasswordOTP(false);
+            SetSettingNewPassword(false);
         }
-    };
+
+    } catch (err) {
+
+        AlertPeep(
+            "error",
+            err.response?.data?.message || "Something went wrong"
+        );
+
+        console.log(err);
+
+        setLoginOTPSend(true);
+        setLoginScreen(false);
+        setForgotPassword(false);
+        setForgotPasswordOTP(false);
+        SetSettingNewPassword(false);
+
+    } finally {
+
+        setLoading(false);
+
+    }
+};
 
     const setPinOnFirstLOgin = async(pin, id)=>{
         try {
@@ -144,7 +201,7 @@ export const AuthProvider = ({ children }) => {
     }
 
   return (
-    <AuthContext.Provider value={{ user, loginWithPinDirectly,moutingLoginChecks ,tempId,LoginStudents, OTPVerificationAndLoginStudents, Loading, firstLogin, setPinOnFirstLOgin }}>
+    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndLoginStudents }}>
       {children}
     </AuthContext.Provider>
   );
