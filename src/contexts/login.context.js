@@ -19,34 +19,34 @@ export const AuthProvider = ({ children }) => {
 
 
 
-  const moutingLoginChecks = async()=>{
+  const moutingLoginChecks = async () => {
     try {
         setLoading(true);
 
         const res = await axios.get(
-        "http://localhost:5000/api/v1/account/isLoggedIn",
+        "http://localhost:5001/api/v1/students/login-check",
         {
-            withCredentials: true, // ✅ MUST
+            withCredentials: true,
         }
         );
 
-        setLoading(false);
+        console.log("login-check:", res.data);
 
-        if (res.data.status === "success") {
-            setUser(res.data.user);
-            console.log(res.data.user)
-            setFirstLogin(res.data.user.firstLogin);
+        return res.data.success;
 
-            return res.data.user; // ✅ correct
-        } else {
-            return null;
-        }
     } catch (err) {
+
+        console.log(
+        "login-check error:",
+        err.response?.data || err.message
+        );
+
+        return false;
+
+    } finally {
         setLoading(false);
-        console.log(err);
-        return null;
     }
-  }
+    };
 
     const LoginStudents = async (email, password) => {
         try {
@@ -57,6 +57,9 @@ export const AuthProvider = ({ children }) => {
                 {
                     email,
                     password
+                },
+                {
+                    withCredentials: true
                 }
             );
 
@@ -252,15 +255,13 @@ export const AuthProvider = ({ children }) => {
     };
 
 
-    const resendOTP = async () => {
+    const resendOTP = async (email) => {
         try {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5001/api/v1/students/resend-otp",
-                {
-                    withCredentials: true,
-                }
+                "http://localhost:5001/api/v1/students/resend-otp-forgot-password",
+                {email}
             );
 
             if (res.data.success) {
@@ -289,8 +290,6 @@ export const AuthProvider = ({ children }) => {
                 "error",
                 err.response?.data?.message || "Something went wrong"
             );
-
-            console.log(err);
 
             setLoginOTPSend(false);
             setLoginScreen(false);
@@ -375,7 +374,7 @@ export const AuthProvider = ({ children }) => {
     }
 
   return (
-    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword, openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP , BackToForgotPasswordOTPSending}}>
+    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword, openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP , BackToForgotPasswordOTPSending, moutingLoginChecks}}>
       {children}
     </AuthContext.Provider>
   );

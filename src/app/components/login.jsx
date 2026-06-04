@@ -1,10 +1,26 @@
-import { useState, useContext  } from "react";
+import { useState, useContext, useEffect  } from "react";
 import { AuthContext } from "@/contexts/login.context";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ButtonLoader from "./btnLoader";
 export default function Login() {
+
   const router = useRouter()
-  const { user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword , openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP, BackToForgotPasswordOTPSending} = useContext(AuthContext);
+  useEffect(() => {
+    const checkLogin = async () => {
+      const isLoggedIn = await moutingLoginChecks();
+
+      if (isLoggedIn) {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
+    };
+
+    checkLogin();
+  }, []);
+
+  const { user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword , openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP, BackToForgotPasswordOTPSending, moutingLoginChecks} = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -72,7 +88,7 @@ export default function Login() {
   function resendOTPFun(e){
     e.preventDefault()
     console.log("lo")
-    resendOTP()
+    resendOTP(forgotPassEmail)
   }
 
   function BackToForgotPasswordOTPSendingFun(e){
@@ -171,7 +187,7 @@ export default function Login() {
                 onClick={handleSubmit}
                 className="cursor-pointer w-full rounded-xl bg-teal-600 py-3 font-semibold text-white transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-200"
                 >
-                Sign In
+                {Loading ? <ButtonLoader/> : "Sign In"}
               </button>
             </form>
 
@@ -253,7 +269,7 @@ export default function Login() {
                   // type="submit"
                   className="cursor-pointer w-full rounded-xl bg-teal-600 py-3 font-semibold text-white transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-200"
                 >
-                  Verify OTP
+                  {Loading ? <ButtonLoader/> : "Verify OTP"}
                 </button>
               </form>
 
@@ -265,7 +281,7 @@ export default function Login() {
                   onClick={resendOTPFun}
                   className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700"
                 >
-                  Resend OTP
+                  {Loading ? <ButtonLoader/> : "Resend OTP"}
                 </button>
               </div>
             </div>
@@ -345,7 +361,7 @@ export default function Login() {
                     hover:shadow-teal-200
                   "
                 >
-                  Send Verification Code
+                  {Loading ? <ButtonLoader/> : "Send Verification Code"}
                 </button>
               </form>
 
@@ -449,7 +465,7 @@ export default function Login() {
                       hover:shadow-teal-200
                     "
                   >
-                    Verify Code
+                    {Loading ? <ButtonLoader/> : "Verify Code"}
                   </button>
                 </form>
 
@@ -458,7 +474,7 @@ export default function Login() {
                   Didn't receive the code?{" "}
                   <button
                     type="button"
-                    onClick={resendOTP}
+                    onClick={resendOTPFun}
                     className="cursor-pointer font-semibold text-teal-600 hover:text-teal-700"
                   >
                     Resend Code
@@ -587,7 +603,7 @@ export default function Login() {
                   hover:shadow-teal-200
                 "
               >
-                Reset Password
+                {Loading ? <ButtonLoader/> : "Reset Password"}
               </button>
             </form>
 
