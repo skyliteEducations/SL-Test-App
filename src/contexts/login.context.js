@@ -322,7 +322,7 @@ export const AuthProvider = ({ children }) => {
     const logoutUser = async () => {
         try {
             const res = await axios.get(
-            "http://localhost:5001/api/v1/students/logout",
+            `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/logout`,
             {
                 withCredentials: true,
             }
