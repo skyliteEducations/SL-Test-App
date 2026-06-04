@@ -138,7 +138,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import Tests from "./tests";
 import MyTests from "./mytests";
 import CBTInstructions from "../desclaimer/page";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import TestDetails from "../test-details/page";
 import AskDoubtForm from "./doubts";
 import ExamDashboard from "./events";
@@ -148,9 +148,13 @@ import SettingsForms from "./settings";
 import FloatingActions from "../components/speedDial";
 import SpeedIcon from '@mui/icons-material/Speed';
 import ChapterWise from "./chapterWiseTest";
+import { AuthContext } from "@/contexts/login.context";
+import { useRouter } from "next/navigation";
+
 export default function Dashboard() {
   const [navigationOptions, setNavigationOption] = useState('My Tests')
-
+  const router = useRouter()
+  const {logoutUser, BackToLogin} = useContext(AuthContext)
   const navItems = [
     { label: 'All Tests',    icon: <QuizIcon fontSize="small"/> },
     { label: 'My Tests',     icon: <TokenIcon fontSize="small"/> },
@@ -162,6 +166,19 @@ export default function Dashboard() {
     { label: 'Settings',     icon: <SettingsIcon fontSize="small"/> },
     { label: 'Logout',       icon: <ExitToAppIcon fontSize="small"/> },
   ]
+
+  async function Actions(label) {
+    setNavigationOption(label);
+
+    if (label === "Logout") {
+      const isLog = await logoutUser();
+
+      if (isLog) {
+        router.push("/");
+        BackToLogin()
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-12 h-screen overflow-hidden">
@@ -181,7 +198,7 @@ export default function Dashboard() {
           {navItems.map(({ label, icon }) => (
             <button
               key={label}
-              onClick={() => setNavigationOption(label)}
+              onClick={() => Actions(label)}
               className={`cursor-pointer flex items-center gap-3 px-3 py-2 text-white rounded-lg transition w-full text-sm font-medium
                 ${navigationOptions === label ? 'bg-teal-600' : 'hover:bg-teal-600'}`}
             >

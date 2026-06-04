@@ -319,6 +319,22 @@ export const AuthProvider = ({ children }) => {
         SetSettingNewPassword(false);
     }
 
+    const logoutUser = async () => {
+        try {
+            const res = await axios.get(
+            "http://localhost:5001/api/v1/students/logout",
+            {
+                withCredentials: true,
+            }
+            );
+
+            return res.data.success;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    };
+
     const setPinOnFirstLOgin = async(pin, id)=>{
         try {
             setLoading(true);
@@ -374,7 +390,7 @@ export const AuthProvider = ({ children }) => {
     }
 
   return (
-    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword, openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP , BackToForgotPasswordOTPSending, moutingLoginChecks}}>
+    <AuthContext.Provider value={{ user, loginOTPSend, loginScreen, Loading, LoginStudents, forgotPassword, forgotPasswordOTP, settingNewPassword, OTPVerificationAndForgotPassword, openForgotPasswordPanel, forgotPasswordOTPSending, settingNewPasswordForgot, BackToLogin, resendOTP , BackToForgotPasswordOTPSending, moutingLoginChecks, logoutUser}}>
       {children}
     </AuthContext.Provider>
   );
