@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5001/api/v1/students/login",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/login`,
                 {
                     email,
                     password
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5001/api/v1/students/forgot",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/forgot`,
                 {
                     email
                 }
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5001/api/v1/students/verify-forgot-password-otp",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/verify-forgot-password-otp`,
                 { email,otp },
                 // {
                 //     withCredentials: true,
@@ -205,7 +205,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5001/api/v1/students/reset",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/reset`,
                 { email, newPassword, confirmPassword},
                 // {
                 //     withCredentials: true,
@@ -260,7 +260,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-                "http://localhost:5001/api/v1/students/resend-otp-forgot-password",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/resend-otp-forgot-password`,
                 {email}
             );
 
@@ -324,7 +324,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-            "http://localhost:5000/api/v1/account/set-pin",
+            `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/account/set-pin`,
             { pin, id },
             {
                 withCredentials: true, // ✅ MUST
@@ -351,7 +351,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.post(
-            "http://localhost:5000/api/v1/account/login-pin",
+            `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/account/login-pin`,
             { pin },
             {
                 withCredentials: true, // ✅ MUST
