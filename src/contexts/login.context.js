@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
 
         const res = await axios.get(
-        "http://localhost:5001/api/v1/students/login-check",
+        `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/students/login-check`,
         {
             withCredentials: true,
         }
