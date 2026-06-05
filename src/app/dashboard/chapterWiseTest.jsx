@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useContext, useEffect} from "react";
 import {
   Box,
   Grid,
@@ -8,7 +8,8 @@ import {
   Button
 } from "@mui/material";
 import ScienceIcon from '@mui/icons-material/Science';
-
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import { ChapterContext } from "../../contexts/chapterwise.context";
 const mathsExamDistribution = [
   { chapterName: 'Continuity_and_Differentiability', difficultyLevel: 'Easy', numberOfQuestions: 1 },
   { chapterName: 'Differentiation', difficultyLevel: 'Medium', numberOfQuestions: 1 },
@@ -143,6 +144,11 @@ const biology = [
   { chapterName: "Plant Kingdom" }
 ]
 export default function ChapterWise() {
+    const {fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets} = useContext(ChapterContext)
+
+    useEffect(el=>{
+        fetchPhysicsChapters()
+    }, [])
 
     const [subject, setSubject] = useState('physics')
     const [exam, setExam] = useState('IITJEE')
@@ -189,6 +195,7 @@ export default function ChapterWise() {
             view : true,
             name : name
         }))
+        fetchPhysicsChapterSheets(name);
     }
 
     return(
@@ -316,7 +323,7 @@ export default function ChapterWise() {
 
             {(subject=='physics' && !innerView.view) &&
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6 bg-[#f5f7f9] rounded-xl">
-                    {physicsExamDistribution.map((el, index) => (
+                    {physicsList?.map((el, index) => (
                         <div
                         key={index}
                         className="relative overflow-hidden group bg-white rounded-[32px] p-8 min-h-[320px] border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -336,14 +343,14 @@ export default function ChapterWise() {
 
                         {/* icon */}
                         <div className="relative z-10 w-24 h-24 rounded-[28px] bg-teal-100 flex items-center justify-center mb-8 group-hover:scale-110 transition-all duration-300">
-                            <ScienceIcon
+                            <PsychologyIcon
                             sx={{ fontSize: 45, color: "#0d9488" }}
                             />
                         </div>
 
                         {/* title */}
                         <h2 className="relative z-10 text-xl font-extrabold text-slate-800 leading-tight mb-4">
-                            {el.chapterName.split("_").join(" ")}
+                            {el.chapter_name.replaceAll("_", " ")}
                         </h2>
 
                         {/* small line */}
@@ -355,7 +362,7 @@ export default function ChapterWise() {
                         </p>
 
                         {/* button */}
-                        <button onClick={()=>setView(el.chapterName.split("_").join(" "))} className="cursor-pointer relative z-10 mt-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300">
+                        <button onClick={()=>setView(el.chapter_name.replaceAll("_", " "))} className="cursor-pointer relative z-10 mt-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300">
                             Start Now →
                         </button>
                         </div>
@@ -473,7 +480,7 @@ export default function ChapterWise() {
                         </button>
 
                     </div>
-                    {[1,2,3].map((el,index)=>(
+                    {physicsSheets?.map((el,index)=>(
                         <div
                         key={index}
                         className="group relative overflow-hidden rounded-[30px] bg-white border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.10)] hover:-translate-y-1 transition-all duration-300 p-6 min-h-[300px]"
@@ -505,7 +512,7 @@ export default function ChapterWise() {
 
                             {/* title */}
                             <h2 className="text-xl font-extrabold text-slate-800">
-                            {innerView.name} - {el}
+                            {el.chapter_name.replaceAll("_", " ")}
                             </h2>
 
                             {/* line */}
@@ -517,12 +524,12 @@ export default function ChapterWise() {
                             </p>
 
                             {/* stats */}
-                            <div className="flex gap-3 mt-6">
+                            <div className="grid grid-cols-2 gap-3 mt-6">
 
                             <div className="px-4 py-2 rounded-xl bg-teal-50 border border-teal-100">
                                 <p className="text-xs text-slate-500">Questions</p>
                                 <h3 className="text-lg font-bold text-teal-700">
-                                45
+                                {el?.sheets[0]?.questions?.length}
                                 </h3>
                             </div>
 
@@ -530,6 +537,13 @@ export default function ChapterWise() {
                                 <p className="text-xs text-slate-500">Duration</p>
                                 <h3 className="text-lg font-bold text-cyan-700">
                                 60 Min
+                                </h3>
+                            </div>
+
+                            <div className="px-4 col-span-2 py-2 rounded-xl bg-cyan-50 border border-cyan-100">
+                                <p className="text-xs text-slate-500">Difficulty level</p>
+                                <h3 className="text-sm font-bold text-cyan-700">
+                                4 Easy , 4 Medium, 4 Hard questions
                                 </h3>
                             </div>
 

@@ -150,7 +150,7 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import ChapterWise from "./chapterWiseTest";
 import { AuthContext } from "@/contexts/login.context";
 import { useRouter } from "next/navigation";
-
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 export default function Dashboard() {
   const [navigationOptions, setNavigationOption] = useState('My Tests')
   const router = useRouter()
@@ -159,6 +159,7 @@ export default function Dashboard() {
     { label: 'All Tests',    icon: <QuizIcon fontSize="small"/> },
     { label: 'My Tests',     icon: <TokenIcon fontSize="small"/> },
     { label: 'Chapter tests',     icon: <SpeedIcon fontSize="small"/> },
+    { label: 'Super 30',     icon: <KeyboardDoubleArrowUpIcon fontSize="small"/> },
     { label: 'Ask Doubts',   icon: <PsychologyIcon fontSize="small"/> },
     { label: 'Analyze',      icon: <DonutSmallIcon fontSize="small"/> },
     { label: 'Events',       icon: <CalendarMonthIcon fontSize="small"/> },
@@ -232,6 +233,8 @@ export default function Dashboard() {
           {navigationOptions === 'Analyze'      && <AnalyzeDashboard />}
           {navigationOptions === 'Settings'     && <SettingsForms />}
           {navigationOptions === 'Chapter tests'     && <ChapterWise />}
+          {navigationOptions === 'Super 30'     && <ChapterWise />}
+
 
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import Script from "next/script"; // ✅ ADD THIS
 import { AuthProvider } from "@/contexts/login.context";
 import { TestProvider } from "@/contexts/test.context";
+import { ChapterProvider } from "@/contexts/chapterwise.context";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -25,11 +26,13 @@ export default function RootLayout({ children }) {
           src="https://docs.opencv.org/4.x/opencv.js"
           strategy="beforeInteractive"
         />
+        <ChapterProvider>
         <TestProvider>
         <AuthProvider>
           {children}
         </AuthProvider>
         </TestProvider>
+        </ChapterProvider>
       </body>
     </html>
   );
