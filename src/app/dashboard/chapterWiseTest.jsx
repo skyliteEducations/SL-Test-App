@@ -10,6 +10,8 @@ import {
 import ScienceIcon from '@mui/icons-material/Science';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import { ChapterContext } from "../../contexts/chapterwise.context";
+import { useRouter } from "next/navigation";
+import FullScreenLoader from "../components/fullLoader";
 const mathsExamDistribution = [
   { chapterName: 'Continuity_and_Differentiability', difficultyLevel: 'Easy', numberOfQuestions: 1 },
   { chapterName: 'Differentiation', difficultyLevel: 'Medium', numberOfQuestions: 1 },
@@ -144,7 +146,8 @@ const biology = [
   { chapterName: "Plant Kingdom" }
 ]
 export default function ChapterWise() {
-    const {fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets} = useContext(ChapterContext)
+    const {fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading} = useContext(ChapterContext)
+    const router = useRouter()
 
     useEffect(el=>{
         fetchPhysicsChapters()
@@ -198,8 +201,28 @@ export default function ChapterWise() {
         fetchPhysicsChapterSheets(name);
     }
 
+    const ExtractedSheet = async (sheetId) => {
+        try {
+            const data = await fetchPhysicsChapterSheetExtracted(sheetId);
+
+            if (!data) {
+                console.log("Sheet fetch failed");
+                return;
+            }
+
+            router.push(`/chaptwerwise/physics?sheetId=${sheetId}`);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    
+
     return(
         <div className="h-full w-full bg-white p-4 overflow-scroll overflow-x-hidden">
+            {Loading &&
+                <FullScreenLoader/>
+            }
             <div className="flex items-center gap-4">
                 <button onClick={switchToPhysics} className={subject == 'physics' ? "relative z-10 mt-auto px-8 py-2 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg hover:shadow-2xl transition-all duration-300" : "relative z-10 mt-auto px-8 py-2 rounded-2xl border-2 border-teal-500 text-teal-600 text-lg font-bold bg-white hover:bg-teal-500 hover:text-white shadow-md hover:shadow-2xl  transition-all duration-300"}>
                     Physics
@@ -550,7 +573,9 @@ export default function ChapterWise() {
                             </div>
 
                             {/* button */}
-                            <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8">
+                            <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
+                            onClick={()=>ExtractedSheet(el._id)}
+                            >
                             Start Test →
                             </button>
 

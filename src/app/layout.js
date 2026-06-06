@@ -4,6 +4,7 @@ import Script from "next/script"; // ✅ ADD THIS
 import { AuthProvider } from "@/contexts/login.context";
 import { TestProvider } from "@/contexts/test.context";
 import { ChapterProvider } from "@/contexts/chapterwise.context";
+import { ChapterTestProvider } from "@/contexts/chapterTestInterface.context";
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
           src="https://docs.opencv.org/4.x/opencv.js"
           strategy="beforeInteractive"
         />
+        <ChapterTestProvider>
         <ChapterProvider>
         <TestProvider>
         <AuthProvider>
@@ -33,6 +35,7 @@ export default function RootLayout({ children }) {
         </AuthProvider>
         </TestProvider>
         </ChapterProvider>
+        </ChapterTestProvider>
       </body>
     </html>
   );
