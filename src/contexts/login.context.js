@@ -5,6 +5,7 @@ import { createContext, useState } from "react";
 import axios from "axios";
 import AlertPeep from "@/app/utility/alert";
 export const AuthContext = createContext();
+import Swal from 'sweetalert2'
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -64,8 +65,14 @@ export const AuthProvider = ({ children }) => {
             );
 
             if (res.data.success) {
-                AlertPeep('success', "Login successfully");
-
+                // AlertPeep('success', "Login successfully");
+                Swal.fire({
+                    position: "top-end",
+                    icon: 'success',
+                    title: 'Login successfully',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
                 setLoginOTPSend(false);
                 setLoginScreen(false);
                 setForgotPassword(false);
@@ -171,10 +178,10 @@ export const AuthProvider = ({ children }) => {
 
                 AlertPeep("error", "Invalid OTP");
 
-                setLoginOTPSend(true);
+                setLoginOTPSend(false);
                 setLoginScreen(false);
                 setForgotPassword(false);
-                setForgotPasswordOTP(false);
+                setForgotPasswordOTP(true);
                 SetSettingNewPassword(false);
             }
 
@@ -187,10 +194,10 @@ export const AuthProvider = ({ children }) => {
 
             console.log(err);
 
-            setLoginOTPSend(true);
+            setLoginOTPSend(false);
             setLoginScreen(false);
             setForgotPassword(false);
-            setForgotPasswordOTP(false);
+            setForgotPasswordOTP(true);
             SetSettingNewPassword(false);
 
         } finally {
