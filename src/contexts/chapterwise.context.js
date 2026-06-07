@@ -51,7 +51,7 @@ export const ChapterProvider = ({ children }) => {
         }
     };
 
-    const fetchPhysicsChapterSheetExtracted = async (sheetId) => {
+    const fetchPhysicsChapterSheetExtracted = async (sheetId, chapter_name) => {
         setLoading(Loading=> true)
 
         try {
@@ -59,8 +59,10 @@ export const ChapterProvider = ({ children }) => {
                 "http://localhost:5001/api/v1/tests/physics-chapterwise-sheet-sending",
                 {sheetId}
             );
-            console.log("full sheet : ", res.data.sheet)
+            console.log("full sheet : ", res.data)
             localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(res.data.sheet))
+            localStorage.setItem("Physics_chapterwise_active_sheet_name", chapter_name)
+
             setLoading(Loading=> false)
 
             // setPhysicsSheets(physicsSheets=> res.data.sheets)

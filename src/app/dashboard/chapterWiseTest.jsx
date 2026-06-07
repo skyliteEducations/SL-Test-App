@@ -203,7 +203,7 @@ export default function ChapterWise() {
 
     const ExtractedSheet = async (sheetId) => {
         try {
-            const data = await fetchPhysicsChapterSheetExtracted(sheetId);
+            const data = await fetchPhysicsChapterSheetExtracted(sheetId, innerView.name);
 
             if (!data) {
                 console.log("Sheet fetch failed");
