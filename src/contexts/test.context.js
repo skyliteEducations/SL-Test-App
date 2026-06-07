@@ -17,7 +17,7 @@ export const TestProvider = ({ children }) => {
             setLoading(true);
 
             const res = await axios.get(
-            "http://localhost:5000/api/v1/paperBuild/maths-paper-to-frontend",
+            `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/paperBuild/maths-paper-to-frontend`,
             {
                 withCredentials: true, // ✅ MUST
             }

@@ -91,7 +91,7 @@ export const ChapterTestProvider = ({ children }) => {
             if(!matched){
                 setLoading(Loading=> true)
                 const res = await axios.post(
-                    "http://localhost:5001/api/v1/tests/chapterwise-mark-for-review",
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/chapterwise-mark-for-review`,
                     {sheetId, questionId},
                     {
                         withCredentials: true,
@@ -117,7 +117,7 @@ export const ChapterTestProvider = ({ children }) => {
         try {
             setLoadingmarking(LoadingMarking=> true)
             const res = await axios.post(
-                "http://localhost:5001/api/v1/tests/marking-option",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/marking-option`,
                 {sheetId, questionId, option},
                 {
                     withCredentials: true,
@@ -166,7 +166,7 @@ export const ChapterTestProvider = ({ children }) => {
         try {
             setSubmitLoading(submitLoading=> true)
             const res = await axios.post(
-                "http://localhost:5001/api/v1/tests/submit-test",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/submit-test`,
                 {sheetId},
                 {
                     withCredentials: true,

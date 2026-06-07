@@ -16,7 +16,7 @@ export const ChapterProvider = ({ children }) => {
         setLoading(Loading=> true)
         try {
             const res = await axios.get(
-                "http://localhost:5001/api/v1/tests/physics-chapters-list"
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapters-list`
             );
             setPhysicsList(physicsList=> res.data.chapters)
             setLoading(Loading=> false)
@@ -35,7 +35,7 @@ export const ChapterProvider = ({ children }) => {
 
         try {
             const res = await axios.post(
-                "http://localhost:5001/api/v1/tests/physics-chapters-specific",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapters-specific`,
                 {chapter}
             );
             console.log(res.data.sheets)
@@ -56,7 +56,7 @@ export const ChapterProvider = ({ children }) => {
 
         try {
             const res = await axios.post(
-                "http://localhost:5001/api/v1/tests/physics-chapterwise-sheet-sending",
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapterwise-sheet-sending`,
                 {sheetId}
             );
             console.log("full sheet : ", res.data)
