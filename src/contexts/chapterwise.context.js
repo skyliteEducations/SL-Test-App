@@ -57,7 +57,10 @@ export const ChapterProvider = ({ children }) => {
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapterwise-sheet-sending`,
-                {sheetId}
+                {sheetId},
+                {
+                    withCredentials : true
+                }
             );
             console.log("full sheet : ", res.data)
             localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(res.data.sheet))

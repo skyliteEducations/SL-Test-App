@@ -27,7 +27,7 @@ export const ChapterTestProvider = ({ children }) => {
             if(subject == 'physics'){
                 sheet = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
                 sheet_name = localStorage.getItem("Physics_chapterwise_active_sheet_name")
-            }   
+            }
             setCurrentSheet(currentSheet=> sheet)
             setCurrentQuestion(currentQuestion=> sheet[0])
             setCurrentQuestionOptions(currentQuestionOptions=> sheet[0])
