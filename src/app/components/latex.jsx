@@ -1,27 +1,307 @@
+// // components/LatexRenderer.jsx
+// 'use client'
+// import 'katex/dist/katex.min.css'
+// import { InlineMath, BlockMath } from 'react-katex'
+
+// export default function LatexRenderer({ text }) {
+//   // Split text into latex and normal parts
+//   if (!text) return null
+//   const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g)
+
+//   return (
+//     <span style={{ color: 'black' }}>  {/* ← yeh add kiya */}
+//       {parts.map((part, i) => {
+//         if (part.startsWith('$$') && part.endsWith('$$')) {
+//           return (
+//             <BlockMath key={i} math={part.slice(2, -2)} />
+//           )
+//         } else if (part.startsWith('$') && part.endsWith('$')) {
+//           return (
+//             <InlineMath key={i} math={part.slice(1, -1)} />
+//           )
+//         } else {
+//           return <span key={i} style={{ color: 'black' }}>{part}</span>
+//         }
+//       })}
+//     </span>
+//   )
+// }
+
+// 'use client'
+// import 'katex/dist/katex.min.css'
+// import { InlineMath, BlockMath } from 'react-katex'
+
+// export default function LatexRenderer({ text }) {
+//   if (!text) return null
+
+//   const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g)
+
+//   return (
+//     <span>
+//       {parts.map((part, i) => {
+//         if (part.startsWith('$$') && part.endsWith('$$')) {
+//           return <BlockMath key={i} math={part.slice(2, -2)} />
+//         } else if (part.startsWith('\\[') && part.endsWith('\\]')) {
+//           return <BlockMath key={i} math={part.slice(2, -2)} />
+//         } else if (part.startsWith('$') && part.endsWith('$')) {
+//           return <InlineMath key={i} math={part.slice(1, -1)} />
+//         } else if (part.startsWith('\\(') && part.endsWith('\\)')) {
+//           return <InlineMath key={i} math={part.slice(2, -2)} />
+//         } else {
+//           return <span key={i}>{part}</span>
+//         }
+//       })}
+//     </span>
+//   )
+// }
+
+// utils/parseLatex.js
+
+
 // components/LatexRenderer.jsx
+// components/LatexRenderer.jsx
+// 'use client'
+// import { useEffect, useRef } from 'react'
+// import 'katex/dist/katex.min.css'
+// import renderMathInElement from 'katex/contrib/auto-render'
+
+// function preprocessLatex(text) {
+//   if (!text) return ''
+
+//   // already delimited hai toh as-is
+//   if (/\$|\\\(|\\\[/.test(text)) return text
+
+//   // LaTeX tokens dhundo — words jisme ^ _ \ { } hain
+//   // unhe \(...\) mein wrap karo, baaki plain text rehne do
+//   return text
+//     .split(/(\s+)/)
+//     .map(token => {
+//       if (/\s+/.test(token)) return token // whitespace as-is
+//       if (/[\\^_{}]/.test(token)) return `\\(${token}\\)` // LaTeX token wrap karo
+//       return token // plain word as-is
+//     })
+//     .join('')
+// }
+
+// export default function LatexRenderer({ text }) {
+//   const ref = useRef(null)
+//   const processed = preprocessLatex(text)
+
+//   useEffect(() => {
+//     if (!ref.current || !processed) return
+//     ref.current.textContent = processed
+//     renderMathInElement(ref.current, {
+//       delimiters: [
+//         { left: '$$',  right: '$$',  display: true  },
+//         { left: '\\[', right: '\\]', display: true  },
+//         { left: '$',   right: '$',   display: false },
+//         { left: '\\(', right: '\\)', display: false },
+//       ],
+//       throwOnError: false,
+//     })
+//   }, [processed])
+
+//   return <span ref={ref}>{processed}</span>
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 'use client'
+// import { useRef, useEffect } from 'react'
+// import 'katex/dist/katex.min.css'
+// import katex from 'katex'
+
+// function renderParts(text) {
+//   if (!text) return []
+
+//   // sabhi delimiter types + bare LaTeX tokens
+//   const REGEX = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\)|(?:[\w@]*(?:[_^]\{[^}]*\}|[_^][^\s,;])+(?:\s*[_^]\{[^}]*\})*[\w@]*)|\\[a-zA-Z]+(?:\{[^}]*\})*)/g
+
+//   const parts = []
+//   let lastIndex = 0
+//   let match
+
+//   while ((match = REGEX.exec(text)) !== null) {
+//     if (match.index > lastIndex) {
+//       parts.push({ type: 'text', content: text.slice(lastIndex, match.index) })
+//     }
+
+//     const raw = match[0]
+
+//     if (raw.startsWith('$$') || raw.startsWith('\\[')) {
+//       parts.push({ type: 'block', content: raw.startsWith('$$') ? raw.slice(2, -2) : raw.slice(2, -2) })
+//     } else if (raw.startsWith('$') || raw.startsWith('\\(')) {
+//       const inner = raw.startsWith('$') ? raw.slice(1, -1) : raw.slice(2, -2)
+//       parts.push({ type: 'inline', content: inner })
+//     } else {
+//       // bare LaTeX token — e.g. x_{O_2}, \rightarrow, \times
+//       parts.push({ type: 'inline', content: raw })
+//     }
+
+//     lastIndex = match.index + raw.length
+//   }
+
+//   if (lastIndex < text.length) {
+//     parts.push({ type: 'text', content: text.slice(lastIndex) })
+//   }
+
+//   return parts
+// }
+
+// function KatexInline({ math }) {
+//   const ref = useRef(null)
+//   useEffect(() => {
+//     if (!ref.current) return
+//     try {
+//       katex.render(math, ref.current, { throwOnError: false, displayMode: false })
+//     } catch (e) {}
+//   }, [math])
+//   return <span ref={ref} />
+// }
+
+// function KatexBlock({ math }) {
+//   const ref = useRef(null)
+//   useEffect(() => {
+//     if (!ref.current) return
+//     try {
+//       katex.render(math, ref.current, { throwOnError: false, displayMode: true })
+//     } catch (e) {}
+//   }, [math])
+//   return <div ref={ref} />
+// }
+
+// export default function LatexRenderer({ text }) {
+//   console.log("RAW:", text)
+//   if (!text) return null
+//   const parts = renderParts(text)
+
+//   return (
+//     <span>
+//       {parts.map((part, i) => {
+//         if (part.type === 'block')  return <KatexBlock  key={i} math={part.content} />
+//         if (part.type === 'inline') return <KatexInline key={i} math={part.content} />
+//         return <span key={i}>{part.content}</span>
+//       })}
+//     </span>
+//   )
+// }
+
+
 'use client'
+import { useRef, useEffect } from 'react'
 import 'katex/dist/katex.min.css'
-import { InlineMath, BlockMath } from 'react-katex'
+import katex from 'katex'
+
+function renderParts(text) {
+  if (!text) return []
+
+  const REGEX = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\)|(?:[\w@]*(?:[_^]\{[^}]*\}|[_^][^\s,;])+(?:\s*[_^]\{[^}]*\})*[\w@]*)|\\[a-zA-Z]+(?:\{[^}]*\})*)/g
+
+  const parts = []
+  let lastIndex = 0
+  let match
+
+  // sabse end mein
+  console.log("PARTS:", JSON.stringify(parts, null, 2))
+
+  while ((match = REGEX.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      const plainText = text.slice(lastIndex, match.index)
+      const raw = match[0]
+
+      // check karo agar plain text ka last word LaTeX ke saath merge hona chahiye
+      // e.g. "for O" + "\(_2\)" → "for " + "O\(_2\)"
+      if (raw.startsWith('\\(') && raw.endsWith('\\)')) {
+        const inner = raw.slice(2, -2) // e.g. "_2"
+        // agar inner sirf subscript/superscript hai toh preceding word merge karo
+        if (/^[_^]/.test(inner)) {
+          const wordMatch = plainText.match(/^([\s\S]*\s)(\S+)$/)
+          if (wordMatch) {
+            // pehle plain text push karo (last word minus)
+            if (wordMatch[1]) parts.push({ type: 'text', content: wordMatch[1] })
+            // last word + subscript ek saath inline
+            parts.push({ type: 'inline', content: wordMatch[2] + inner })
+            lastIndex = match.index + raw.length
+            continue
+          } else {
+            // koi space nahi — poora plainText merge karo
+            if (plainText) parts.push({ type: 'inline', content: plainText + inner })
+            else parts.push({ type: 'inline', content: inner })
+            lastIndex = match.index + raw.length
+            continue
+          }
+        }
+      }
+
+      if (plainText) parts.push({ type: 'text', content: plainText })
+    }
+
+    const raw = match[0]
+
+    if (raw.startsWith('$$') || raw.startsWith('\\[')) {
+      parts.push({ type: 'block', content: raw.slice(2, -2) })
+    } else if (raw.startsWith('$') || raw.startsWith('\\(')) {
+      parts.push({ type: 'inline', content: raw.startsWith('$') ? raw.slice(1, -1) : raw.slice(2, -2) })
+    } else {
+      parts.push({ type: 'inline', content: raw })
+    }
+
+    lastIndex = match.index + raw.length
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({ type: 'text', content: text.slice(lastIndex) })
+  }
+
+  return parts
+}
+
+function KatexInline({ math }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!ref.current) return
+    try {
+      katex.render(math, ref.current, { throwOnError: false, displayMode: false })
+    } catch (e) {}
+  }, [math])
+  return <span ref={ref} />
+}
+
+function KatexBlock({ math }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!ref.current) return
+    try {
+      katex.render(math, ref.current, { throwOnError: false, displayMode: true })
+    } catch (e) {}
+  }, [math])
+  return <div ref={ref} />
+}
 
 export default function LatexRenderer({ text }) {
-  // Split text into latex and normal parts
   if (!text) return null
-  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g)
+  const parts = renderParts(text)
 
   return (
-    <span style={{ color: 'black' }}>  {/* ← yeh add kiya */}
+    <span>
       {parts.map((part, i) => {
-        if (part.startsWith('$$') && part.endsWith('$$')) {
-          return (
-            <BlockMath key={i} math={part.slice(2, -2)} />
-          )
-        } else if (part.startsWith('$') && part.endsWith('$')) {
-          return (
-            <InlineMath key={i} math={part.slice(1, -1)} />
-          )
-        } else {
-          return <span key={i} style={{ color: 'black' }}>{part}</span>
-        }
+        if (part.type === 'block')  return <KatexBlock  key={i} math={part.content} />
+        if (part.type === 'inline') return <KatexInline key={i} math={part.content} />
+        return <span key={i}>{part.content}</span>
       })}
     </span>
   )

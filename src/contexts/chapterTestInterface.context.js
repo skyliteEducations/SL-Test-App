@@ -27,9 +27,16 @@ export const ChapterTestProvider = ({ children }) => {
             if(subject == 'physics'){
                 sheet = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
                 sheet_name = localStorage.getItem("Physics_chapterwise_active_sheet_name")
+            }else if(subject == 'chemistry'){
+                sheet = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+                sheet_name = localStorage.getItem("Chemistry_chapterwise_active_sheet_name") 
+            }else if(subject == 'maths'){
+                sheet = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+                sheet_name = localStorage.getItem("Maths_chapterwise_active_sheet_name") 
             }
             setCurrentSheet(currentSheet=> sheet)
             setCurrentQuestion(currentQuestion=> sheet[0])
+
             setCurrentQuestionOptions(currentQuestionOptions=> sheet[0])
             setCurrentQuestionDiagrams(currentQuestionDiagrams=> sheet[0])
             setCurrentSheetName(currentSheetName=> sheet_name)
@@ -55,6 +62,7 @@ export const ChapterTestProvider = ({ children }) => {
     const nextQuestionMove = async(question_number,sheet)=>{
         try{
             const question = sheet[question_number]
+            console.log(question.question_smiles)
             setCurrentQuestion(currentQuestion=> question)
             setCurrentQuestionOptions(currentQuestionOptions=> question)
             setCurrentQuestionDiagrams(currentQuestionDiagrams=> question)
@@ -183,9 +191,139 @@ export const ChapterTestProvider = ({ children }) => {
         }
     }
 
+    ////////////////////////////////////////// approach 2 for faster responses ////////////////////////////////////////////
+    const [queueRef, setQueref] = useState(0)
+
+    const backendUpdateUtility = async(subject)=>{
+        if(subject=='maths'){
+            if(queueRef== 3){
+                let questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+                questions = questions.filter(el=>{
+                    if(el.action){
+                        return el
+                    }
+                })
+                console.log(questions)
+            }
+        }
+    }
+
+    const localDbUpdateOnOptionSelect = async(questionId, sheetId, option, qn, subject)=>{
+        try{
+            setLoadingmarking(LoadingMarking=> true)
+            let questions 
+            if(subject=='maths'){
+                questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            }
+            questions = questions.map((el) => {
+                if (el.questionId === questionId) {
+                    return {
+                    ...el,
+                    OptionMarked: option,
+                    action : true
+
+                    };
+                }
+                return el;
+            });
+            if(subject=='maths'){
+                localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questions))
+            }
+            setCurrentSheet(currentSheet=> questions);
+            setCurrentQuestion(currentQuestion=> questions[qn-1])
+            setLoadingmarking(LoadingMarking=> false)
+            setQueref(queueRef=> queueRef+1);
+            localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
+            if(queueRef+1==3){
+                backendUpdateUtility()
+            }
+            return questions;
+        }catch(error){
+            console.error("Error fetching chapters:", error);
+            setLoadingmarking(LoadingMarking=> false)
+            return null;
+        }
+    }
+
+    const localDbUpdateOnMarkAsReviewSelect = async(questionId, sheetId, qn, subject)=>{
+        try{
+            setLoadingmarking(LoadingMarking=> true)
+            let questions 
+            if(subject=='maths'){
+                questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            }
+            questions = questions.map((el) => {
+                if (el.questionId === questionId) {
+                    return {
+                    ...el,
+                    MarkForReview: 'true',
+                    action : true
+
+                    };
+                }
+                return el;
+            });
+            if(subject=='maths'){
+                localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questions))
+            }
+            setCurrentSheet(currentSheet=> questions);
+            setCurrentQuestion(currentQuestion=> questions[qn-1])
+            setLoadingmarking(LoadingMarking=> false)
+            setQueref(queueRef=> queueRef+1);
+            localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
+            if(queueRef+1==3){
+                backendUpdateUtility()
+            }
+            return questions;
+        }catch(error){
+            console.error("Error fetching chapters:", error);
+            setLoadingmarking(LoadingMarking=> false)
+            return null;
+        }
+    }
+
+    const localDbUpdateOnOptionRemove = async(questionId, sheetId, qn, subject)=>{
+        try{
+            setLoadingmarking(LoadingMarking=> true)
+            let questions 
+            if(subject=='maths'){
+                questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            }
+            questions = questions.map((el) => {
+                if (el.questionId === questionId) {
+                    return {
+                    ...el,
+                    OptionMarked: '',
+                    action : true
+                    };
+                }
+                return el;
+            });
+            if(subject=='maths'){
+                localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questions))
+            }
+            setCurrentSheet(currentSheet=> questions);
+            setCurrentQuestion(currentQuestion=> questions[qn-1])
+            setLoadingmarking(LoadingMarking=> false)
+            setQueref(queueRef=> queueRef+1);
+
+            
+
+            localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
+            if(queueRef+1==3){
+                backendUpdateUtility()
+            }
+            return questions;
+        }catch(error){
+            console.error("Error fetching chapters:", error);
+            setLoadingmarking(LoadingMarking=> false)
+            return null;
+        }
+    }
+
 
     return (
-        <ChapterTestContext.Provider value={{ fetchingCurrentSheet, currentSheet, Loading, questionChangingByNumberPress, currentQuestion, renderQuestionNumber , currentQuestionOptions, currentQuestionDiagrams, nextQuestionMove, previousQuestionMove, currentSheetName, markForReview, markingOption, LoadingMarking, markReviewCounte, markAnsweredCount, markUnattemptedCount, questionCounter, submitTest, submitLoading}}>
+        <ChapterTestContext.Provider value={{ fetchingCurrentSheet, currentSheet, Loading, questionChangingByNumberPress, currentQuestion, renderQuestionNumber , currentQuestionOptions, currentQuestionDiagrams, nextQuestionMove, previousQuestionMove, currentSheetName, markForReview, markingOption, LoadingMarking, markReviewCounte, markAnsweredCount, markUnattemptedCount, questionCounter, submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove}}>
             {children}
         </ChapterTestContext.Provider>
     );
