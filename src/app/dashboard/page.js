@@ -263,7 +263,7 @@ export default function Dashboard() {
             {navItems.slice(5).map(({ label, icon }) => (
               <button
                 key={label}
-                onClick={() => setNavigationOption(label)}
+                onClick={() => Actions(label)}
                 className="flex items-center gap-3 px-4 py-3 text-white text-sm hover:bg-teal-600 transition"
               >
                 {icon}

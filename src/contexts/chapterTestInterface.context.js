@@ -194,17 +194,30 @@ export const ChapterTestProvider = ({ children }) => {
     ////////////////////////////////////////// approach 2 for faster responses ////////////////////////////////////////////
     const [queueRef, setQueref] = useState(0)
 
-    const backendUpdateUtility = async(subject)=>{
+    const backendUpdateUtility = async(subject, sheetId)=>{
         if(subject=='maths'){
-            if(queueRef== 3){
-                let questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
-                questions = questions.filter(el=>{
-                    if(el.action){
-                        return el
+            let questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            questions = questions.filter(el=>{
+                if(el.action){
+                    return el
+                }
+            })
+            console.log(questions)
+
+            try{
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/bulk-chapterwise-sheet-updation`,
+                    {sheetId, deltaResponse : questions},
+                    {
+                        withCredentials: true,
                     }
-                })
-                console.log(questions)
+                );
+                return res.data;
+            }catch(error){
+                console.error("Error fetching chapters:", error);
+                return null;
             }
+
         }
     }
 
@@ -234,8 +247,9 @@ export const ChapterTestProvider = ({ children }) => {
             setLoadingmarking(LoadingMarking=> false)
             setQueref(queueRef=> queueRef+1);
             localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
-            if(queueRef+1==3){
-                backendUpdateUtility()
+            const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
+            if(queueCheck==3){
+                backendUpdateUtility(subject, sheetId)
             }
             return questions;
         }catch(error){
@@ -271,8 +285,9 @@ export const ChapterTestProvider = ({ children }) => {
             setLoadingmarking(LoadingMarking=> false)
             setQueref(queueRef=> queueRef+1);
             localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
-            if(queueRef+1==3){
-                backendUpdateUtility()
+            const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
+            if(queueCheck==3){
+                backendUpdateUtility(subject, sheetId)
             }
             return questions;
         }catch(error){
@@ -307,11 +322,10 @@ export const ChapterTestProvider = ({ children }) => {
             setLoadingmarking(LoadingMarking=> false)
             setQueref(queueRef=> queueRef+1);
 
-            
-
             localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
-            if(queueRef+1==3){
-                backendUpdateUtility()
+            const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
+            if(queueCheck==3){
+                backendUpdateUtility(subject, sheetId)
             }
             return questions;
         }catch(error){

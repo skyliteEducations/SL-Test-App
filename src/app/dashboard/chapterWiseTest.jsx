@@ -176,6 +176,11 @@ export default function ChapterWise() {
         }
     };
 
+    const activeClass =
+    "px-6 cursor-pointer py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 font-semibold border border-slate-200 shadow-sm transition-colors duration-200";
+
+    const inactiveClass =
+    "px-6 cursor-pointer py-2.5 rounded-xl text-slate-500 font-medium hover:text-slate-900 transition-colors duration-200";
     
 
     return(
@@ -183,25 +188,38 @@ export default function ChapterWise() {
             {Loading &&
                 <FullScreenLoader/>
             }
-            <div className="flex items-center gap-4">
-                <button onClick={switchToPhysics} className={subject == 'physics' ? "relative z-10 mt-auto px-8 py-2 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg hover:shadow-2xl transition-all duration-300" : "relative z-10 mt-auto px-8 py-2 rounded-2xl border-2 border-teal-500 text-teal-600 text-lg font-bold bg-white hover:bg-teal-500 hover:text-white shadow-md hover:shadow-2xl  transition-all duration-300"}>
+            <div className="flex flex-wrap items-center gap-2 p-1 bg-slate-100 rounded-2xl w-fit">
+                <button
+                    onClick={switchToPhysics}
+                    className={subject === "physics" ? activeClass : inactiveClass}
+                >
                     Physics
                 </button>
 
-                <button onClick={switchToChemistry} className={subject == 'chemistry' ? "relative z-10 mt-auto px-8 py-2 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg  hover:shadow-2xl transition-all duration-300" : "relative z-10 mt-auto px-8 py-2 rounded-2xl border-2 border-teal-500 text-teal-600 text-lg font-bold bg-white hover:bg-teal-500 hover:text-white shadow-md hover:shadow-2xl transition-all duration-300"}>
+                <button
+                    onClick={switchToChemistry}
+                    className={subject === "chemistry" ? activeClass : inactiveClass}
+                >
                     Chemistry
                 </button>
 
-                {exam == 'IITJEE' &&
-                    <button onClick={switchToMaths} className={subject == 'maths' ? "relative z-10 mt-auto px-8 py-2 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg  hover:shadow-2xl transition-all duration-300" : "relative z-10 mt-auto px-8 py-2 rounded-2xl border-2 border-teal-500 text-teal-600 text-lg font-bold bg-white hover:bg-teal-500 hover:text-white shadow-md hover:shadow-2xl transition-all duration-300"}>
+                {exam === "IITJEE" && (
+                    <button
+                        onClick={switchToMaths}
+                        className={subject === "maths" ? activeClass : inactiveClass}
+                    >
                         Mathematics
                     </button>
-                }
-                {exam == 'NEET' &&
-                    <button onClick={switchToBiology} className={subject == 'biology' ? "relative z-10 mt-auto px-8 py-2 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-md font-bold shadow-lg  hover:shadow-2xl transition-all duration-300" : "relative z-10 mt-auto px-8 py-2 rounded-2xl border-2 border-teal-500 text-teal-600 text-lg font-bold bg-white hover:bg-teal-500 hover:text-white shadow-md hover:shadow-2xl transition-all duration-300"}>
+                )}
+
+                {exam === "NEET" && (
+                    <button
+                        onClick={switchToBiology}
+                        className={subject === "biology" ? activeClass : inactiveClass}
+                    >
                         Biology
                     </button>
-                }
+                )}
             </div>
             <hr className="my-6 border-0 h-[2px] bg-gradient-to-r from-transparent via-teal-500 to-transparent rounded-full shadow-md" />
 
