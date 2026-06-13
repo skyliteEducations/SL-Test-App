@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState } from "react";
+import { createContext, useState, useRef } from "react";
 import axios from "axios";
 import AlertPeep from "@/app/utility/alert";
 export const ChapterTestContext = createContext();
@@ -194,6 +194,17 @@ export const ChapterTestProvider = ({ children }) => {
     ////////////////////////////////////////// approach 2 for faster responses ////////////////////////////////////////////
     const [queueRef, setQueref] = useState(0)
 
+    const mountingRefresh = async()=>{
+        try{
+            setQueref(queueRef=> 0);
+            localStorage.setItem("chapterwiseCurrentQueue", 0)
+            return true;
+        }catch(error){
+            console.error("Error fetching chapters:", error);
+            return null;
+        }
+    }
+
     const backendUpdateUtility = async(subject, sheetId)=>{
         if(subject=='maths'){
             let questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
@@ -212,6 +223,9 @@ export const ChapterTestProvider = ({ children }) => {
                         withCredentials: true,
                     }
                 );
+
+                setQueref(queueRef=> 0);
+                localStorage.setItem("chapterwiseCurrentQueue", 0)      
                 return res.data;
             }catch(error){
                 console.error("Error fetching chapters:", error);
@@ -220,7 +234,7 @@ export const ChapterTestProvider = ({ children }) => {
 
         }
     }
-
+    const saveTimeoutRef = useRef(null);
     const localDbUpdateOnOptionSelect = async(questionId, sheetId, option, qn, subject)=>{
         try{
             setLoadingmarking(LoadingMarking=> true)
@@ -245,12 +259,42 @@ export const ChapterTestProvider = ({ children }) => {
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
             setLoadingmarking(LoadingMarking=> false)
-            setQueref(queueRef=> queueRef+1);
-            localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
-            const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
-            if(queueCheck==3){
-                backendUpdateUtility(subject, sheetId)
-            }
+            // setQueref(queueRef=> queueRef+1);
+            // localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
+            // const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
+            // if(queueCheck==3){
+            //     backendUpdateUtility(subject, sheetId)
+            // }
+            setQueref((prevQueue) => {
+                const updatedQueue = prevQueue + 1;
+
+                localStorage.setItem(
+                    "chapterwiseCurrentQueue",
+                    String(updatedQueue)
+                );
+
+                // Purana timer hata do
+                clearTimeout(saveTimeoutRef.current);
+
+                // Queue 3 hui to turant backend save
+                if (updatedQueue >= 3) {
+                    backendUpdateUtility(subject, sheetId);
+                    return 0;
+                }
+
+                // Last action ke 15 sec baad save
+                saveTimeoutRef.current = setTimeout(() => {
+                    const currentQueue = Number(
+                        localStorage.getItem("chapterwiseCurrentQueue")
+                    );
+
+                    if (currentQueue > 0) {
+                        backendUpdateUtility(subject, sheetId);
+                    }
+                }, 15000);
+
+                return updatedQueue;
+            });
             return questions;
         }catch(error){
             console.error("Error fetching chapters:", error);
@@ -283,12 +327,36 @@ export const ChapterTestProvider = ({ children }) => {
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
             setLoadingmarking(LoadingMarking=> false)
-            setQueref(queueRef=> queueRef+1);
-            localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
-            const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
-            if(queueCheck==3){
-                backendUpdateUtility(subject, sheetId)
-            }
+            setQueref((prevQueue) => {
+                const updatedQueue = prevQueue + 1;
+
+                localStorage.setItem(
+                    "chapterwiseCurrentQueue",
+                    String(updatedQueue)
+                );
+
+                // Purana timer hata do
+                clearTimeout(saveTimeoutRef.current);
+
+                // Queue 3 hui to turant backend save
+                if (updatedQueue >= 3) {
+                    backendUpdateUtility(subject, sheetId);
+                    return 0;
+                }
+
+                // Last action ke 15 sec baad save
+                saveTimeoutRef.current = setTimeout(() => {
+                    const currentQueue = Number(
+                        localStorage.getItem("chapterwiseCurrentQueue")
+                    );
+
+                    if (currentQueue > 0) {
+                        backendUpdateUtility(subject, sheetId);
+                    }
+                }, 15000);
+
+                return updatedQueue;
+            });
             return questions;
         }catch(error){
             console.error("Error fetching chapters:", error);
@@ -320,13 +388,36 @@ export const ChapterTestProvider = ({ children }) => {
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
             setLoadingmarking(LoadingMarking=> false)
-            setQueref(queueRef=> queueRef+1);
+            setQueref((prevQueue) => {
+                const updatedQueue = prevQueue + 1;
 
-            localStorage.setItem("chapterwiseCurrentQueue", String(queueRef+1))
-            const queueCheck = localStorage.getItem("chapterwiseCurrentQueue")
-            if(queueCheck==3){
-                backendUpdateUtility(subject, sheetId)
-            }
+                localStorage.setItem(
+                    "chapterwiseCurrentQueue",
+                    String(updatedQueue)
+                );
+
+                // Purana timer hata do
+                clearTimeout(saveTimeoutRef.current);
+
+                // Queue 3 hui to turant backend save
+                if (updatedQueue >= 3) {
+                    backendUpdateUtility(subject, sheetId);
+                    return 0;
+                }
+
+                // Last action ke 15 sec baad save
+                saveTimeoutRef.current = setTimeout(() => {
+                    const currentQueue = Number(
+                        localStorage.getItem("chapterwiseCurrentQueue")
+                    );
+
+                    if (currentQueue > 0) {
+                        backendUpdateUtility(subject, sheetId);
+                    }
+                }, 15000);
+
+                return updatedQueue;
+            });
             return questions;
         }catch(error){
             console.error("Error fetching chapters:", error);
@@ -337,7 +428,7 @@ export const ChapterTestProvider = ({ children }) => {
 
 
     return (
-        <ChapterTestContext.Provider value={{ fetchingCurrentSheet, currentSheet, Loading, questionChangingByNumberPress, currentQuestion, renderQuestionNumber , currentQuestionOptions, currentQuestionDiagrams, nextQuestionMove, previousQuestionMove, currentSheetName, markForReview, markingOption, LoadingMarking, markReviewCounte, markAnsweredCount, markUnattemptedCount, questionCounter, submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove}}>
+        <ChapterTestContext.Provider value={{ fetchingCurrentSheet, currentSheet, Loading, questionChangingByNumberPress, currentQuestion, renderQuestionNumber , currentQuestionOptions, currentQuestionDiagrams, nextQuestionMove, previousQuestionMove, currentSheetName, markForReview, markingOption, LoadingMarking, markReviewCounte, markAnsweredCount, markUnattemptedCount, questionCounter, submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove, mountingRefresh}}>
             {children}
         </ChapterTestContext.Provider>
     );

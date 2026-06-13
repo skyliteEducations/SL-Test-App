@@ -342,7 +342,7 @@ export default function UtilChapterWise(props) {
         markForReview, markingOption, LoadingMarking,
         markReviewCounte, markAnsweredCount,
         markUnattemptedCount, questionCounter,
-        submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove
+        submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove, mountingRefresh
     } = useContext(ChapterTestContext)
 
     const router = useRouter()
@@ -357,6 +357,10 @@ export default function UtilChapterWise(props) {
     useEffect(el => {
         questionCounter()
     }, [currentSheet])
+
+    useEffect(el=>{
+        mountingRefresh()
+    }, [])
 
     function questionSelectionBasedOnNumbericPress(qNum) {
         questionChangingByNumberPress(qNum, currentSheet)
