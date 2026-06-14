@@ -426,9 +426,29 @@ export const ChapterTestProvider = ({ children }) => {
         }
     }
 
+    const ChapterWiseTestSubmission = async(sheetResponse, sheetId, subject)=>{
+        try{
+            setSubmitLoading(submitLoading=> true)
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/submit-chapterwise-sheet`,
+                {sheetResponse, sheetId, subject},
+                {
+                    withCredentials: true,
+                }
+            );
+            setSubmitLoading(submitLoading=> false)
+            return true
+
+        }catch(error){
+            console.error("Error fetching chapters:", error);
+            setSubmitLoading(submitLoading=> false)
+            return null;
+        }
+    }
+
 
     return (
-        <ChapterTestContext.Provider value={{ fetchingCurrentSheet, currentSheet, Loading, questionChangingByNumberPress, currentQuestion, renderQuestionNumber , currentQuestionOptions, currentQuestionDiagrams, nextQuestionMove, previousQuestionMove, currentSheetName, markForReview, markingOption, LoadingMarking, markReviewCounte, markAnsweredCount, markUnattemptedCount, questionCounter, submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove, mountingRefresh}}>
+        <ChapterTestContext.Provider value={{ fetchingCurrentSheet, currentSheet, Loading, questionChangingByNumberPress, currentQuestion, renderQuestionNumber , currentQuestionOptions, currentQuestionDiagrams, nextQuestionMove, previousQuestionMove, currentSheetName, markForReview, markingOption, LoadingMarking, markReviewCounte, markAnsweredCount, markUnattemptedCount, questionCounter, submitTest, submitLoading, localDbUpdateOnOptionSelect, localDbUpdateOnMarkAsReviewSelect, localDbUpdateOnOptionRemove, mountingRefresh, ChapterWiseTestSubmission}}>
             {children}
         </ChapterTestContext.Provider>
     );
