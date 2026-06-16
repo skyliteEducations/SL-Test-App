@@ -27,7 +27,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Deploy Dev Server
-        if: github.ref == 'refs/heads/devserver'
+        if: github.ref == 'refs/heads/dev_backupnew'
         run: |
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/id_ed25519 \
@@ -41,8 +41,8 @@ jobs:
 
           cd /home/administrator/apps/students/dev_server/SL-Test-App
 
-          git fetch origin devserver
-          git reset --hard origin/devserver
+          git fetch origin dev_backupnew
+          git reset --hard origin/dev_backupnew
           git clean -fd
 
           rm -rf .next
