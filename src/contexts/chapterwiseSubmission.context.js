@@ -88,9 +88,14 @@ export const ChapterSubmitProvider = ({ children }) => {
 
     const ExtarctionSheetOnMounting = async (sheetId, chapter_name, subject) => {
         setLoading(Loading=> true)
+        console.log(subject)
+        console.log(chapter_name)
+        console.log(sheetId)
+
         if(subject == 'physics'){
 
             try {
+                console.log("called", subject, sheetId);
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapterwise-sheet-sending`,
                     {sheetId,submit:true},

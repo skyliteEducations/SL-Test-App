@@ -13,7 +13,13 @@ export default function ResultPage() {
 
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search)
+         console.log(window.location.search);
 
+    console.log({
+        subject: searchParams.get("subject"),
+        sheetId: searchParams.get("sheet"),
+        chapterName: searchParams.get("chapterName")
+    });
         setParams({
             subject: searchParams.get("subject"),
             sheetId: searchParams.get("sheet"),

@@ -5,9 +5,12 @@ import LatexRenderer from '../components/latex'
 export default function Landing(props) {
 
     const {ExtarctionSheetOnMounting, Loading, headerCreds, questions, calculationFun, calculations} = useContext(ChapterSubmitContext)
-
+    console.log("ExtarctionSheetOnMounting", ExtarctionSheetOnMounting);
     useEffect(() => {
+        console.log("fired")
+        console.log("props", props)
         const complete = async () => {
+            console.log("done")
             await ExtarctionSheetOnMounting(
                 props.sheetId,
                 props.chapterName,
@@ -18,7 +21,7 @@ export default function Landing(props) {
         };
 
         complete();
-    }, []);
+    }, [props.subject, props.sheetId, props.chapterName]);
 
 
     const [activeTab, setActiveTab] = useState('questions')
