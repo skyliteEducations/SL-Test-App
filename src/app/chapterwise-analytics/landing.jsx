@@ -636,6 +636,13 @@ export default function Landing(props) {
                                     <div className="text-slate-800 text-[15px] leading-7 mb-6">
                                         <LatexRenderer text={qp?.question} />
                                     </div>
+                                    {(qp?.diagram && qp?.diagrams[0]) &&
+                                        <img
+                                            src={qp?.diagrams[0]?.url}
+                                            alt="Diagram"
+                                            className="w-[50vh] h-[40vh] mb-10 max-w-xl rounded-xl border border-gray-200 object-contain"
+                                        />
+                                    }
 
                                     {/* Options */}
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -2,8 +2,8 @@
 
 import { createContext, useState, useRef } from "react";
 import axios from "axios";
-import AlertPeep from "@/app/utility/alert";
 export const ChapterTestContext = createContext();
+import AlertPeep from "@/app/utility/alert";
 
 export const ChapterTestProvider = ({ children }) => {
 
@@ -218,7 +218,7 @@ export const ChapterTestProvider = ({ children }) => {
             try{
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/bulk-chapterwise-sheet-updation`,
-                    {sheetId, deltaResponse : questions},
+                    {sheetId, deltaResponse : questions, subject},
                     {
                         withCredentials: true,
                     }
@@ -226,12 +226,80 @@ export const ChapterTestProvider = ({ children }) => {
 
                 setQueref(queueRef=> 0);
                 localStorage.setItem("chapterwiseCurrentQueue", 0)      
+                let questionsAfterMerge = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+                questionsAfterMerge = questionsAfterMerge.map(el => {
+                    el.action = ''
+                    return el
+                })
+                localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questionsAfterMerge))
                 return res.data;
             }catch(error){
                 console.error("Error fetching chapters:", error);
                 return null;
             }
 
+        }else if(subject=='physics'){
+            let questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
+            questions = questions.filter(el=>{
+                if(el.action){
+                    return el
+                }
+            })
+            console.log(questions)
+
+            try{
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/bulk-chapterwise-sheet-updation`,
+                    {sheetId, deltaResponse : questions, subject},
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                setQueref(queueRef=> 0);
+                localStorage.setItem("chapterwiseCurrentQueue", 0)      
+                let questionsAfterMerge = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
+                questionsAfterMerge = questionsAfterMerge.map(el => {
+                    el.action = ''
+                    return el
+                })
+                localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questionsAfterMerge))
+                return res.data;
+            }catch(error){
+                console.error("Error fetching chapters:", error);
+                return null;
+            }
+        }else if(subject=='chemistry'){
+            let questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+            questions = questions.filter(el=>{
+                if(el.action){
+                    return el
+                }
+            })
+            console.log(questions)
+
+            try{
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/bulk-chapterwise-sheet-updation`,
+                    {sheetId, deltaResponse : questions, subject},
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                setQueref(queueRef=> 0);
+                localStorage.setItem("chapterwiseCurrentQueue", 0)      
+                let questionsAfterMerge = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+                questionsAfterMerge = questionsAfterMerge.map(el => {
+                    el.action = ''
+                    return el
+                })
+                localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questionsAfterMerge))
+                return res.data;
+            }catch(error){
+                console.error("Error fetching chapters:", error);
+                return null;
+            }
         }
     }
     const saveTimeoutRef = useRef(null);
@@ -239,8 +307,14 @@ export const ChapterTestProvider = ({ children }) => {
         try{
             setLoadingmarking(LoadingMarking=> true)
             let questions 
+            console.log(subject)
+
             if(subject=='maths'){
                 questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            }else if(subject=='physics'){
+                questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
+            }else if(subject=='chemistry'){
+                questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
             }
             questions = questions.map((el) => {
                 if (el.questionId === questionId) {
@@ -255,6 +329,10 @@ export const ChapterTestProvider = ({ children }) => {
             });
             if(subject=='maths'){
                 localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='physics'){
+                localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='chemistry'){
+                localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questions))
             }
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
@@ -307,8 +385,13 @@ export const ChapterTestProvider = ({ children }) => {
         try{
             setLoadingmarking(LoadingMarking=> true)
             let questions 
+            console.log(subject)
             if(subject=='maths'){
                 questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            }else if(subject=='physics'){
+                questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
+            }else if(subject=='chemistry'){
+                questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
             }
             questions = questions.map((el) => {
                 if (el.questionId === questionId) {
@@ -323,6 +406,10 @@ export const ChapterTestProvider = ({ children }) => {
             });
             if(subject=='maths'){
                 localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='physics'){
+                localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='chemistry'){
+                localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questions))
             }
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
@@ -371,6 +458,10 @@ export const ChapterTestProvider = ({ children }) => {
             let questions 
             if(subject=='maths'){
                 questions = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
+            }else if(subject=='physics'){
+                questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
+            }else if(subject=='chemistry'){
+                questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
             }
             questions = questions.map((el) => {
                 if (el.questionId === questionId) {
@@ -384,6 +475,10 @@ export const ChapterTestProvider = ({ children }) => {
             });
             if(subject=='maths'){
                 localStorage.setItem("Maths_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='physics'){
+                localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='chemistry'){
+                localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questions))
             }
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])

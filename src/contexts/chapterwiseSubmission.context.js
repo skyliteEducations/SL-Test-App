@@ -31,6 +31,20 @@ export const ChapterSubmitProvider = ({ children }) => {
                     "Maths_chapterwise_active_submitted_sheet"
                 )
                 ) || [];
+            }else if(subject=== 'physics'){
+                questions =
+                JSON.parse(
+                localStorage.getItem(
+                    "Physics_chapterwise_active_submitted_sheet"
+                )
+                ) || [];
+            }else if(subject=='chemistry'){
+                questions =
+                JSON.parse(
+                localStorage.getItem(
+                    "Chemistry_chapterwise_active_submitted_sheet"
+                )
+                ) || []; 
             }
 
             let correct = 0;
@@ -117,7 +131,7 @@ export const ChapterSubmitProvider = ({ children }) => {
                     chapter_name: chapter_name,
                     subject: subject
                 }));
-                setQuestions(questions=> JSON.parse(localStorage.getItem("Physics_chapterwise_active_submitted_sheet")))
+                setQuestions(questions=> JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_submitted_sheet")))
 
                 setLoading(Loading=> false)
     
@@ -133,7 +147,7 @@ export const ChapterSubmitProvider = ({ children }) => {
             try {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/maths-chapterwise-sheet-sending`,
-                    {sheetId, submit:true},
+                    {sheetId,submit:true},
                     {
                         withCredentials : true
                     }

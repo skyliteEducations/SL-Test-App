@@ -401,7 +401,13 @@ export default function UtilChapterWise(props) {
             }
             const signal = await ChapterWiseTestSubmission(sheetResponse, sheetId, props.subject)
             if (signal) {
-                router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Maths_chapterwise_active_sheet_name")}`)
+                if(props.subject=='maths'){
+                    router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Maths_chapterwise_active_sheet_name")}`)
+                }else if(props.subject=='physics'){
+                    router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Physics_chapterwise_active_sheet_name")}`)
+                }else if(props.subject=='chemistry'){
+                    router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Chemistry_chapterwise_active_sheet_name")}`)
+                }
             }
         } catch (error) { 
             console.log(error.message)
