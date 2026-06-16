@@ -9,10 +9,18 @@ export const ChapterProvider = ({ children }) => {
 
     const [physicsList, setPhysicsList] = useState([])
     const [mathsList, setMathsList] = useState([])
+    const [filterMathsList, setFilterMathsList] = useState([])
+    const [filterPhysicsList, setFilterPhysicsList] = useState([])
 
     const [organicChapters, setOrganicChapters] = useState([])
+    const [filterOrganicChapters, setFilterOrganicChapters] = useState([])
+
     const [physicalChapters, setPhysicalChapters] = useState([])
+    const [filterPhysicalChapters, setFilterPhysicalChapters] = useState([])
+
     const [inorganicChapters, setInorganicChapters] = useState([])
+    const [filterInorganicChapters, setFilterInorganicChapters] = useState([])
+
     const [physicsSheets, setPhysicsSheets] = useState([])
     const [mathsSheets, setMathsSheets] = useState([])
     const [chemistrySheets, setChemistrySheets] = useState([])
@@ -27,6 +35,8 @@ export const ChapterProvider = ({ children }) => {
                 `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapters-list`
             );
             setPhysicsList(physicsList=> res.data.chapters)
+            setFilterPhysicsList(filterPhysicsList=> res.data.chapters)
+
             setLoading(Loading=> false)
 
             return res.data;
@@ -48,7 +58,9 @@ export const ChapterProvider = ({ children }) => {
             setOrganicChapters(organicChapters=> res.data.organic)
             setInorganicChapters(inorganicChapters=> res.data.inorganic)
             setPhysicalChapters(physicalChapters=> res.data.physical)
-
+            setFilterOrganicChapters(filterOrganicChapters=> res.data.organic)
+            setFilterInorganicChapters(filterInorganicChapters=> res.data.inorganic)
+            setFilterPhysicalChapters(filterPhysicalChapters=> res.data.physical)
             setLoading(Loading=> false)
 
             return res.data;
@@ -67,6 +79,8 @@ export const ChapterProvider = ({ children }) => {
                 `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/maths-chapters-list-sending`
             );
             setMathsList(mathsList=> res.data.chapters)
+            setFilterMathsList(filterMathsList=> res.data.chapters)
+
             console.log("maths",res.data)
             setLoading(Loading=> false)
 
@@ -85,7 +99,10 @@ export const ChapterProvider = ({ children }) => {
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapters-specific`,
-                {chapter}
+                {chapter},
+                {
+                    withCredentials : true
+                }
             );
             console.log(res.data.sheets)
             setPhysicsSheets(physicsSheets=> res.data.sheets)
@@ -129,7 +146,10 @@ export const ChapterProvider = ({ children }) => {
         try {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/maths-chapters-specific`,
-                {chapter}
+                {chapter},
+                {
+                    withCredentials : true
+                }
             );
             console.log(res.data.sheets)
             setMathsSheets(mathsSheets=> res.data.sheets)
@@ -151,7 +171,7 @@ export const ChapterProvider = ({ children }) => {
             try {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/physics-chapterwise-sheet-sending`,
-                    {sheetId},
+                    {sheetId, chapterName : chapter_name},
                     {
                         withCredentials : true
                     }
@@ -174,7 +194,7 @@ export const ChapterProvider = ({ children }) => {
             try {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/chemistry-chapterwise-sheet-sending`,
-                    {sheetId},
+                    {sheetId, chapterName : chapter_name},
                     {
                         withCredentials : true
                     }
@@ -197,7 +217,7 @@ export const ChapterProvider = ({ children }) => {
             try {
                 const res = await axios.post(
                     `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/maths-chapterwise-sheet-sending`,
-                    {sheetId},
+                    {sheetId,chapterName : chapter_name},
                     {
                         withCredentials : true
                     }
@@ -218,9 +238,66 @@ export const ChapterProvider = ({ children }) => {
             }
         }
     };
+
+    function mathsSearch(text, listsav){
+        let listnew = listsav
+        console.log(listnew)
+        listnew = listnew.filter(el=>{
+            if(el.chapter_name.toLowerCase().includes(text.toLowerCase())){
+                return el
+            }
+        })
+        setFilterMathsList(filterMathsList=> listnew)
+    }
+
+    function physicsSearch(text, listsav){
+        let listnew = listsav
+        console.log(listnew)
+        listnew = listnew.filter(el=>{
+            if(el.chapter_name.toLowerCase().includes(text.toLowerCase())){
+                return el
+            }
+        })
+        setFilterPhysicsList(filterPhysicsList=> listnew)
+    }
+
+    function organicSearch(text, listsav){
+        let listnew = listsav
+        console.log(listnew)
+        listnew = listnew.filter(el=>{
+            if(el.chapter_name.toLowerCase().includes(text.toLowerCase())){
+                return el
+            }
+        })
+        setFilterOrganicChapters(filterOrganicChapters=> listnew)
+    }
+
+    function inorganicSearch(text, listsav){
+        let listnew = listsav
+        console.log(listnew)
+        listnew = listnew.filter(el=>{
+            if(el.chapter_name.toLowerCase().includes(text.toLowerCase())){
+                return el
+            }
+        })
+        setFilterInorganicChapters(filterInorganicChapters=> listnew)
+    }
+
+    function physicalSearch(text, listsav){
+        let listnew = listsav
+        console.log(listnew)
+        listnew = listnew.filter(el=>{
+            if(el.chapter_name.toLowerCase().includes(text.toLowerCase())){
+                return el
+            }
+        })
+        setFilterPhysicalChapters(filterPhysicalChapters=> listnew)
+    }
+
+
     
     return (
-        <ChapterContext.Provider value={{ fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters , fetchChemistryChapterSheets, chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets}}>
+        <ChapterContext.Provider value={{ fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters , fetchChemistryChapterSheets, chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets,mathsSearch, filterMathsList, filterPhysicsList, physicsSearch, filterOrganicChapters, organicSearch, inorganicSearch, filterInorganicChapters, filterPhysicalChapters, physicalSearch}}>
           {children}
         </ChapterContext.Provider>
     );

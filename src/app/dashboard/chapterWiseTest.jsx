@@ -80,7 +80,7 @@ const biology = [
   { chapterName: "Plant Kingdom" }
 ]
 export default function ChapterWise() {
-    const {fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters, fetchChemistryChapterSheets , chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets} = useContext(ChapterContext)
+    const {fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters, fetchChemistryChapterSheets , chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets, mathsSearch, filterMathsList, filterPhysicsList, physicsSearch, filterOrganicChapters, organicSearch, inorganicSearch, filterInorganicChapters, physicalSearch, filterPhysicalChapters} = useContext(ChapterContext)
     const router = useRouter()
     const [chemistryCatagory, setChemistryCatagory] = useState("organic")
     useEffect(el=>{
@@ -176,12 +176,41 @@ export default function ChapterWise() {
         }
     };
 
+    const viewSolutionFun = async(sheetId)=>{
+        if(subject=='maths'){
+            router.push(`/chapterwise-analytics?subject=${subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Maths_chapterwise_active_sheet_name")}`)
+        }else if(subject=='physics'){
+            router.push(`/chapterwise-analytics?subject=${subject}&sheet=${sheetId}&chapterName=${innerView.name}`)
+        }else if(subject=='chemistry'){
+            router.push(`/chapterwise-analytics?subject=${subject}&sheet=${sheetId}&chapterName=${innerView.name}`)
+        }
+    }
+
     const activeClass =
     "px-6 cursor-pointer py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 font-semibold border border-slate-200 shadow-sm transition-colors duration-200";
 
     const inactiveClass =
     "px-6 cursor-pointer py-2.5 rounded-xl text-slate-500 font-medium hover:text-slate-900 transition-colors duration-200";
     
+    function searchMathsChapters(text){
+        mathsSearch(text.target.value, mathsList)
+    }
+
+    function searchPhysicsChapters(text){
+        physicsSearch(text.target.value, physicsList)
+    }
+
+    function searchOrganicChapters(text){
+        organicSearch(text.target.value, organicChapters)
+    }
+
+    function searchInOrganicChapters(text){
+        inorganicSearch(text.target.value, inorganicChapters)
+    }
+
+    function searchPhysicalChapters(text){
+        physicalSearch(text.target.value, physicalChapters)
+    }
 
     return(
         <div className="h-full w-full bg-white p-4 overflow-scroll overflow-x-hidden">
@@ -225,7 +254,92 @@ export default function ChapterWise() {
 
             {(subject=='maths' && exam=='IITJEE' && !innerView.view) &&
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6 bg-[#f5f7f9] rounded-xl">
-                    {mathsList?.map((el, index) => (
+                    {/* <div className="relative w-full max-w-md col-span-3">
+                        <input
+                            type="text"
+                            placeholder="Search chapter..."
+                            onChange={(e)=>searchMathsChapters(e)}
+                            defaultValue={''}
+                            className="
+                                w-full
+                                pl-12
+                                pr-4
+                                py-3
+                                rounded-xl
+                                border
+                                border-gray-200
+                                bg-white
+                                text-gray-700
+                                placeholder:text-gray-400
+                                shadow-sm
+                                outline-none
+                                transition-all
+                                duration-200
+                                focus:border-teal-500
+                                focus:ring-4
+                                focus:ring-teal-100
+                                focus:shadow-md
+                            "
+                        />
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z"
+                            />
+                        </svg>
+                    </div> */}
+                    <div className="relative w-full col-span-1 sm:col-span-2 lg:col-span-3">
+                        <input
+                            type="text"
+                            placeholder="Search chapter..."
+                            onChange={(e)=>searchMathsChapters(e)}
+                            className="
+                                w-full
+                                pl-12
+                                pr-4
+                                py-3
+                                rounded-xl
+                                border
+                                border-gray-200
+                                bg-white
+                                text-gray-700
+                                placeholder:text-gray-400
+                                shadow-sm
+                                outline-none
+                                transition-all
+                                duration-200
+                                focus:border-teal-500
+                                focus:ring-4
+                                focus:ring-teal-100
+                                focus:shadow-md
+                            "
+                        />
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z"
+                            />
+                        </svg>
+                    </div>
+                    {filterMathsList?.map((el, index) => (
                         <div
                         key={index}
                         className="relative overflow-hidden group bg-white rounded-[32px] p-8 min-h-[320px] border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -324,7 +438,51 @@ export default function ChapterWise() {
 
             {(subject=='physics' && !innerView.view) &&
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6 bg-[#f5f7f9] rounded-xl">
-                    {physicsList?.map((el, index) => (
+                    
+                    <div className="relative w-full col-span-1 sm:col-span-2 lg:col-span-3">
+                        <input
+                            type="text"
+                            placeholder="Search chapter..."
+                            onChange={(e)=>searchPhysicsChapters(e)}
+                            className="
+                                w-full
+                                pl-12
+                                pr-4
+                                py-3
+                                rounded-xl
+                                border
+                                border-gray-200
+                                bg-white
+                                text-gray-700
+                                placeholder:text-gray-400
+                                shadow-sm
+                                outline-none
+                                transition-all
+                                duration-200
+                                focus:border-teal-500
+                                focus:ring-4
+                                focus:ring-teal-100
+                                focus:shadow-md
+                            "
+                        />
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z"
+                            />
+                        </svg>
+                    </div>
+
+                    {filterPhysicsList?.map((el, index) => (
                         <div
                         key={index}
                         className="relative overflow-hidden group bg-white rounded-[32px] p-8 min-h-[320px] border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -412,7 +570,51 @@ export default function ChapterWise() {
 
                     {chemistryCatagory == 'organic' &&
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6 bg-[#f5f7f9] rounded-xl">
-                        {organicChapters.map((el, index) => (
+
+                        <div className="relative w-full col-span-1 sm:col-span-2 lg:col-span-3">
+                            <input
+                                type="text"
+                                placeholder="Search chapter..."
+                                onChange={(e)=>searchOrganicChapters(e)}
+                                className="
+                                    w-full
+                                    pl-12
+                                    pr-4
+                                    py-3
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    bg-white
+                                    text-gray-700
+                                    placeholder:text-gray-400
+                                    shadow-sm
+                                    outline-none
+                                    transition-all
+                                    duration-200
+                                    focus:border-teal-500
+                                    focus:ring-4
+                                    focus:ring-teal-100
+                                    focus:shadow-md
+                                "
+                            />
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z"
+                                />
+                            </svg>
+                    </div>
+
+                        {filterOrganicChapters.map((el, index) => (
                             <div
                             key={index}
                             className="relative overflow-hidden group bg-white rounded-[32px] p-8 min-h-[320px] border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -462,7 +664,51 @@ export default function ChapterWise() {
 
                     {chemistryCatagory == 'inorganic' &&
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6 bg-[#f5f7f9] rounded-xl">
-                        {inorganicChapters.map((el, index) => (
+
+                        <div className="relative w-full col-span-1 sm:col-span-2 lg:col-span-3">
+                            <input
+                                type="text"
+                                placeholder="Search chapter..."
+                                onChange={(e)=>searchInOrganicChapters(e)}
+                                className="
+                                    w-full
+                                    pl-12
+                                    pr-4
+                                    py-3
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    bg-white
+                                    text-gray-700
+                                    placeholder:text-gray-400
+                                    shadow-sm
+                                    outline-none
+                                    transition-all
+                                    duration-200
+                                    focus:border-teal-500
+                                    focus:ring-4
+                                    focus:ring-teal-100
+                                    focus:shadow-md
+                                "
+                            />
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z"
+                                />
+                            </svg>
+                    </div>
+
+                        {filterInorganicChapters.map((el, index) => (
                             <div
                             key={index}
                             className="relative overflow-hidden group bg-white rounded-[32px] p-8 min-h-[320px] border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -512,7 +758,52 @@ export default function ChapterWise() {
 
                     {chemistryCatagory == 'physical' &&
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6 bg-[#f5f7f9] rounded-xl">
-                        {physicalChapters.map((el, index) => (
+
+                        <div className="relative w-full col-span-1 sm:col-span-2 lg:col-span-3">
+                            <input
+                                type="text"
+                                placeholder="Search chapter..."
+                                onChange={(e)=>searchPhysicalChapters(e)}
+                                className="
+                                    w-full
+                                    pl-12
+                                    pr-4
+                                    py-3
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    bg-white
+                                    text-gray-700
+                                    placeholder:text-gray-400
+                                    shadow-sm
+                                    outline-none
+                                    transition-all
+                                    duration-200
+                                    focus:border-teal-500
+                                    focus:ring-4
+                                    focus:ring-teal-100
+                                    focus:shadow-md
+                                "
+                            />
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z"
+                                />
+                            </svg>
+                    </div>
+
+
+                        {filterPhysicalChapters.map((el, index) => (
                             <div
                             key={index}
                             className="relative overflow-hidden group bg-white rounded-[32px] p-8 min-h-[320px] border border-teal-100 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center"
@@ -742,11 +1033,25 @@ export default function ChapterWise() {
                                 </div>
 
                                 {/* button */}
-                                <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
+                                {/* <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
                                 onClick={()=>ExtractedSheet(el._id)}
                                 >
                                 Start Test →
-                                </button>
+                                </button> */}
+                                {el.attempted &&
+                                    <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
+                                    onClick={()=>viewSolutionFun(el._id)}
+                                    >
+                                    View solutions
+                                    </button>
+                                }
+                                {!(el.attempted) &&
+                                    <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
+                                    onClick={()=>ExtractedSheet(el._id)}
+                                    >
+                                    Start test
+                                    </button>
+                                }
 
                             </div>
                             </div>
@@ -914,11 +1219,20 @@ export default function ChapterWise() {
                                 </div>
 
                                 {/* button */}
-                                <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
-                                onClick={()=>ExtractedSheet(el._id)}
-                                >
-                                Start Test →
-                                </button>
+                                {el.attempted &&
+                                    <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
+                                    onClick={()=>viewSolutionFun(el._id)}
+                                    >
+                                    View solutions
+                                    </button>
+                                }
+                                {!(el.attempted) &&
+                                    <button className="cursor-pointer mt-1 w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm font-bold shadow-lg hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 mt-8"
+                                    onClick={()=>ExtractedSheet(el._id)}
+                                    >
+                                    Start test
+                                    </button>
+                                }
 
                             </div>
                             </div>

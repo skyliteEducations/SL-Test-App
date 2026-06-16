@@ -216,7 +216,7 @@ export default function Dashboard() {
         {/* Top Bar */}
         <div className="h-[10vh] min-h-[56px] w-full bg-teal-500 px-4 flex items-center justify-between shrink-0">
           <h2 className="text-white text-lg font-semibold tracking-wide">
-            Hi, <span className="font-bold text-yellow-200">Gursimran</span> 👋
+            <span className="font-bold text-yellow-200">SKYCBT &mdash; AI powered platform</span> 
           </h2>
           <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold">
             G
