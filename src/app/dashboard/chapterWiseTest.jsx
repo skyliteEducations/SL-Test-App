@@ -13,7 +13,7 @@ import { ChapterContext } from "../../contexts/chapterwise.context";
 import { useRouter } from "next/navigation";
 import FullScreenLoader from "../components/fullLoader";
 import BiotechIcon from '@mui/icons-material/Biotech';
-
+import CalculateIcon from '@mui/icons-material/Calculate';
 
 export default function ChapterWise() {
     const {fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters, fetchChemistryChapterSheets , chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets, mathsSearch, filterMathsList, filterPhysicsList, physicsSearch, filterOrganicChapters, organicSearch, inorganicSearch, filterInorganicChapters, physicalSearch, filterPhysicalChapters, fetchBiologyChapters, filterBiologyChapters, bioSearch, biologyChapters, fetchBiologyChapterSheets, biologySheets} = useContext(ChapterContext)
@@ -306,7 +306,7 @@ export default function ChapterWise() {
 
                         {/* icon */}
                         <div className="relative z-10 w-24 h-24 rounded-[28px] bg-teal-100 flex items-center justify-center mb-8 group-hover:scale-110 transition-all duration-300">
-                            <ScienceIcon
+                            <CalculateIcon
                             sx={{ fontSize: 45, color: "#0d9488" }}
                             />
                         </div>
