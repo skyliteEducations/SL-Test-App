@@ -398,6 +398,8 @@ export default function UtilChapterWise(props) {
                 sheetResponse = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
             }else if(props.subject == 'chemistry'){
                 sheetResponse = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+            }else if(props.subject == 'biology'){
+                sheetResponse = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
             }
             const signal = await ChapterWiseTestSubmission(sheetResponse, sheetId, props.subject)
             if (signal) {
@@ -407,6 +409,8 @@ export default function UtilChapterWise(props) {
                     router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Physics_chapterwise_active_sheet_name")}`)
                 }else if(props.subject=='chemistry'){
                     router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Chemistry_chapterwise_active_sheet_name")}`)
+                }else if(props.subject=='biology'){
+                    router.push(`/chapterwise-analytics?subject=${props.subject}&sheet=${sheetId}&chapterName=${localStorage.getItem("Biology_chapterwise_active_sheet_name")}`)
                 }
             }
         } catch (error) { 

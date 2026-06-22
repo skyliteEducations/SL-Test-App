@@ -33,6 +33,9 @@ export const ChapterTestProvider = ({ children }) => {
             }else if(subject == 'maths'){
                 sheet = JSON.parse(localStorage.getItem("Maths_chapterwise_active_sheet"))
                 sheet_name = localStorage.getItem("Maths_chapterwise_active_sheet_name") 
+            }else if(subject == 'biology'){
+                sheet = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
+                sheet_name = localStorage.getItem("Biology_chapterwise_active_sheet_name") 
             }
             setCurrentSheet(currentSheet=> sheet)
             setCurrentQuestion(currentQuestion=> sheet[0])
@@ -301,6 +304,38 @@ export const ChapterTestProvider = ({ children }) => {
                 return null;
             }
         }
+        else if(subject=='biology'){
+            let questions = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
+            questions = questions.filter(el=>{
+                if(el.action){
+                    return el
+                }
+            })
+            console.log(questions)
+
+            try{
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/bulk-chapterwise-sheet-updation`,
+                    {sheetId, deltaResponse : questions, subject},
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                setQueref(queueRef=> 0);
+                localStorage.setItem("chapterwiseCurrentQueue", 0)      
+                let questionsAfterMerge = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
+                questionsAfterMerge = questionsAfterMerge.map(el => {
+                    el.action = ''
+                    return el
+                })
+                localStorage.setItem("Biology_chapterwise_active_sheet", JSON.stringify(questionsAfterMerge))
+                return res.data;
+            }catch(error){
+                console.error("Error fetching chapters:", error);
+                return null;
+            }
+        }
     }
     const saveTimeoutRef = useRef(null);
     const localDbUpdateOnOptionSelect = async(questionId, sheetId, option, qn, subject)=>{
@@ -315,6 +350,8 @@ export const ChapterTestProvider = ({ children }) => {
                 questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
             }else if(subject=='chemistry'){
                 questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+            }else if(subject=='biology'){
+                questions = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
             }
             questions = questions.map((el) => {
                 if (el.questionId === questionId) {
@@ -333,6 +370,8 @@ export const ChapterTestProvider = ({ children }) => {
                 localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questions))
             }else if(subject=='chemistry'){
                 localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='biology'){
+                localStorage.setItem("Biology_chapterwise_active_sheet", JSON.stringify(questions))
             }
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
@@ -392,6 +431,8 @@ export const ChapterTestProvider = ({ children }) => {
                 questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
             }else if(subject=='chemistry'){
                 questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+            }else if(subject=='biology'){
+                questions = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
             }
             questions = questions.map((el) => {
                 if (el.questionId === questionId) {
@@ -410,6 +451,8 @@ export const ChapterTestProvider = ({ children }) => {
                 localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questions))
             }else if(subject=='chemistry'){
                 localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='biology'){
+                localStorage.setItem("Biology_chapterwise_active_sheet", JSON.stringify(questions))
             }
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])
@@ -462,6 +505,8 @@ export const ChapterTestProvider = ({ children }) => {
                 questions = JSON.parse(localStorage.getItem("Physics_chapterwise_active_sheet"))
             }else if(subject=='chemistry'){
                 questions = JSON.parse(localStorage.getItem("Chemistry_chapterwise_active_sheet"))
+            }else if(subject=='biology'){
+                questions = JSON.parse(localStorage.getItem("Biology_chapterwise_active_sheet"))
             }
             questions = questions.map((el) => {
                 if (el.questionId === questionId) {
@@ -479,6 +524,8 @@ export const ChapterTestProvider = ({ children }) => {
                 localStorage.setItem("Physics_chapterwise_active_sheet", JSON.stringify(questions))
             }else if(subject=='chemistry'){
                 localStorage.setItem("Chemistry_chapterwise_active_sheet", JSON.stringify(questions))
+            }else if(subject=='biology'){
+                localStorage.setItem("Biology_chapterwise_active_sheet", JSON.stringify(questions))
             }
             setCurrentSheet(currentSheet=> questions);
             setCurrentQuestion(currentQuestion=> questions[qn-1])

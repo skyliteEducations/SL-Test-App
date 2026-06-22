@@ -45,6 +45,13 @@ export const ChapterSubmitProvider = ({ children }) => {
                     "Chemistry_chapterwise_active_submitted_sheet"
                 )
                 ) || []; 
+            }else if(subject=='biology'){
+                questions =
+                JSON.parse(
+                localStorage.getItem(
+                    "Biology_chapterwise_active_submitted_sheet"
+                )
+                ) || []; 
             }
 
             let correct = 0;
@@ -165,6 +172,34 @@ export const ChapterSubmitProvider = ({ children }) => {
                     subject: subject
                 }));
                 setQuestions(questions=> JSON.parse(localStorage.getItem("Maths_chapterwise_active_submitted_sheet")))
+
+                setLoading(Loading=> false)
+    
+                // setPhysicsSheets(physicsSheets=> res.data.sheets)
+                return res.data;
+            } catch (error) {
+                console.error("Error fetching chapters:", error);
+                setLoading(Loading=> false)
+    
+                return null;
+            }
+        }else if(subject=='biology'){
+            try {
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/biology-chapterwise-sheet-sending`,
+                    {sheetId,submit:true},
+                    {
+                        withCredentials : true
+                    }
+                );
+                console.log("full sheet : ", res.data)
+                localStorage.setItem("Biology_chapterwise_active_submitted_sheet", JSON.stringify(res.data.sheet))
+                localStorage.setItem("Biology_chapterwise_active_submitted_sheet_name", chapter_name)
+                setHeaderCreds(headerCreds => ({
+                    chapter_name: chapter_name,
+                    subject: subject
+                }));
+                setQuestions(questions=> JSON.parse(localStorage.getItem("Biology_chapterwise_active_submitted_sheet")))
 
                 setLoading(Loading=> false)
     

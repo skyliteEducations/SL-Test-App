@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         );
 
         console.log("login-check:", res.data);
+        localStorage.setItem("examCBT", res.data.exam)
 
         return res.data.success;
 
@@ -78,7 +79,7 @@ export const AuthProvider = ({ children }) => {
                 setForgotPassword(false);
                 setForgotPasswordOTP(false);
                 SetSettingNewPassword(false);
-
+                localStorage.setItem("examCBT", res.data.exam)
                 return true;
             } else {
                 AlertPeep('error', res.data.message);

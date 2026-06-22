@@ -18,15 +18,22 @@ export const ChapterProvider = ({ children }) => {
     const [physicalChapters, setPhysicalChapters] = useState([])
     const [filterPhysicalChapters, setFilterPhysicalChapters] = useState([])
 
+    const [biologyChapters, setBiologyChapters] = useState([])
+    const [filterBiologyChapters, setFilterBiologyChapters] = useState([])
+
     const [inorganicChapters, setInorganicChapters] = useState([])
     const [filterInorganicChapters, setFilterInorganicChapters] = useState([])
 
     const [physicsSheets, setPhysicsSheets] = useState([])
     const [mathsSheets, setMathsSheets] = useState([])
     const [chemistrySheets, setChemistrySheets] = useState([])
+    const [biologySheets, setBiologySheets] = useState([])
 
     const [activePhysicsSheetSolving, setActivePhysicsSheetSolving] = useState([])
     const [Loading, setLoading] = useState(true)
+
+
+    
 
     const fetchPhysicsChapters = async () => {
         setLoading(Loading=> true)
@@ -82,6 +89,27 @@ export const ChapterProvider = ({ children }) => {
             setFilterMathsList(filterMathsList=> res.data.chapters)
 
             console.log("maths",res.data)
+            setLoading(Loading=> false)
+
+            return res.data;
+        } catch (error) {
+            console.error("Error fetching chapters:", error);
+            setLoading(Loading=> false)
+
+            return null;
+        }
+    };
+
+    const fetchBiologyChapters = async () => {
+        setLoading(Loading=> true)
+        try {
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/biology-chapters-list`
+            );
+            setBiologyChapters(biologyChapters=> res.data.chapters)
+            setFilterBiologyChapters(filterBiologyChapters=> res.data.chapters)
+
+            console.log("biology",res.data)
             setLoading(Loading=> false)
 
             return res.data;
@@ -153,6 +181,30 @@ export const ChapterProvider = ({ children }) => {
             );
             console.log(res.data.sheets)
             setMathsSheets(mathsSheets=> res.data.sheets)
+            setLoading(Loading=> false)
+
+            return res.data;
+        } catch (error) {
+            console.error("Error fetching chapters:", error);
+            setLoading(Loading=> false)
+
+            return null;
+        }
+    };
+
+    const fetchBiologyChapterSheets = async (chapter) => {
+        setLoading(Loading=> true)
+
+        try {
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/biology-chapters-specific`,
+                {chapter},
+                {
+                    withCredentials : true
+                }
+            );
+            console.log(res.data.sheets)
+            setBiologySheets(biologySheets=> res.data.sheets)
             setLoading(Loading=> false)
 
             return res.data;
@@ -236,6 +288,29 @@ export const ChapterProvider = ({ children }) => {
     
                 return null;
             }
+        }else if(subject=='biology'){
+            try {
+                const res = await axios.post(
+                    `${process.env.NEXT_PUBLIC_ENVIRONMENT=='Development' ? process.env.NEXT_PUBLIC_BASE_URL_LOCAL : process.env.NEXT_PUBLIC_BASE_URL_PROD }/api/v1/tests/biology-chapterwise-sheet-sending`,
+                    {sheetId,chapterName : chapter_name},
+                    {
+                        withCredentials : true
+                    }
+                );
+                console.log("full sheet : ", res.data)
+                localStorage.setItem("Biology_chapterwise_active_sheet", JSON.stringify(res.data.sheet))
+                localStorage.setItem("Biology_chapterwise_active_sheet_name", chapter_name)
+    
+                setLoading(Loading=> false)
+    
+                // setPhysicsSheets(physicsSheets=> res.data.sheets)
+                return res.data;
+            } catch (error) {
+                console.error("Error fetching chapters:", error);
+                setLoading(Loading=> false)
+    
+                return null;
+            }
         }
     };
 
@@ -294,10 +369,21 @@ export const ChapterProvider = ({ children }) => {
         setFilterPhysicalChapters(filterPhysicalChapters=> listnew)
     }
 
+    function bioSearch(text, listsav){
+        let listnew = listsav
+        console.log(listnew)
+        listnew = listnew.filter(el=>{
+            if(el.chapter_name.toLowerCase().includes(text.toLowerCase())){
+                return el
+            }
+        })
+        setFilterBiologyChapters(filterBiologyChapters=> listnew)
+    }
+
 
     
     return (
-        <ChapterContext.Provider value={{ fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters , fetchChemistryChapterSheets, chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets,mathsSearch, filterMathsList, filterPhysicsList, physicsSearch, filterOrganicChapters, organicSearch, inorganicSearch, filterInorganicChapters, filterPhysicalChapters, physicalSearch}}>
+        <ChapterContext.Provider value={{ fetchPhysicsChapters, physicsList, fetchPhysicsChapterSheets, physicsSheets, fetchPhysicsChapterSheetExtracted, Loading, fetchChemistryChapters, organicChapters, inorganicChapters, physicalChapters , fetchChemistryChapterSheets, chemistrySheets, fetchMathsChapters, mathsList, fetchMathsChapterSheets, mathsSheets,mathsSearch, filterMathsList, filterPhysicsList, physicsSearch, filterOrganicChapters, organicSearch, inorganicSearch, filterInorganicChapters, filterPhysicalChapters, physicalSearch, fetchBiologyChapters, filterBiologyChapters, bioSearch, biologyChapters, fetchBiologyChapterSheets, biologySheets}}>
           {children}
         </ChapterContext.Provider>
     );
